@@ -1,8 +1,19 @@
-#include <iostream>
-#include <librealsense2/rs.hpp>
-#include <opencv2/opencv.hpp>
+#include "Camera.h"
 
-void initialize_config(rs2::config& config) {
+#include <iostream>
+
+namespace fireflybot {
+bool Camera::initialize() {
+  std::cout << "Initializing Camera" << std::endl;
+  rs2::config config;
+  set_config(config);
+  pipeline_.start(config);
+
+  return true;
+}
+
+void Camera::set_config(rs2::config& config) {
+  std::cout << "Setting camera config" << std::endl;
   config.disable_all_streams();  // save processing power
   auto color_stream = RS2_STREAM_COLOR;
   int width = 640;
@@ -12,41 +23,33 @@ void initialize_config(rs2::config& config) {
   config.enable_stream(color_stream, width, height, format, framerate);
 }
 
-void print_frame_info(const rs2::video_frame& color) {
-  std::cout << "Received frame!" << std::endl;
-  int width = color.get_width();
-  int height = color.get_height();
-
-  std::cout << "width: " << width << std::endl;
-  std::cout << "height: " << height << std::endl;
-}
-
-void save_image(const rs2::video_frame& color_frame) {
+cv::Mat Camera::convert_to_opencv(const rs2::video_frame& color_frame) {
   int width = color_frame.get_width();
   int height = color_frame.get_height();
-
   cv::Mat cv_img(cv::Size(width, height), CV_8UC3,
                  (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-  bool check = cv::imwrite("img.jpg", cv_img);
+  return cv_img;
+}
 
+void Camera::save_image(const cv::Mat& cv_img) {
+  bool check = cv::imwrite("img.jpg", cv_img);
   if (check == false) {
     std::cout << "FAILED to save image" << std::endl;
   }
 }
 
-int main() {
-  std::cout << "Starting fireflybot!" << std::endl;
+void Camera::wait_for_flash() {
+  std::cout << "Waiting to detect firefly flash" << std::endl;
 
-  rs2::config config;
-  initialize_config(config);
-
-  rs2::pipeline pipeline;
-  pipeline.start(config);
-
-  rs2::frameset frames = pipeline.wait_for_frames();
+  rs2::frameset frames = pipeline_.wait_for_frames();
   rs2::video_frame color_frame = frames.get_color_frame();
-  print_frame_info(color_frame);
-  save_image(color_frame);
 
-  return 0;
+  cv::Mat cv_img = convert_to_opencv(color_frame);
+  save_image(cv_img);
+
+  // do some image processing here
+
+  return;
 }
+
+}  // namespace fireflybot

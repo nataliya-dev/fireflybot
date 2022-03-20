@@ -6,6 +6,8 @@ find_package(realsense2 REQUIRED)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-add_executable(fireflybot src/camera.cpp)
+include_directories(include)
+
+add_executable(fireflybot src/main.cpp src/Camera.cpp src/Blink.cpp src/Sync.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${realsense2_LIBRARY} ${OpenCV_LIBS})
