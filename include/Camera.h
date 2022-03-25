@@ -11,14 +11,15 @@ class Camera {
   ~Camera(){};
 
   bool initialize();
-  void wait_for_flash();
+  bool is_flash_detected();
 
  private:
   rs2::pipeline pipeline_;
 
   void set_config(rs2::config& config);
   cv::Mat convert_to_opencv(const rs2::video_frame& color_frame);
-  void save_image(const cv::Mat& cv_img);
+  void save_image(const cv::Mat& cv_img, std::string name);
+  bool detect_blob(const cv::Mat& img);
 };
 
 }  // namespace fireflybot

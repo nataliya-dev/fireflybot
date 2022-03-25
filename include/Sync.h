@@ -5,13 +5,18 @@
 #include "Camera.h"
 
 namespace fireflybot {
+
+enum class Status { ON = 0, OFF };
+
 class Sync {
  public:
-  Sync(){};
+  Sync();
   ~Sync(){};
 
   bool initialize();
   void start();
+
+  static Status STATUS;
 
  private:
   Camera camera_;

@@ -3,6 +3,11 @@
 #include <iostream>
 
 namespace fireflybot {
+
+Status Sync::STATUS = Status::ON;
+
+Sync::Sync() {}
+
 bool Sync::initialize() {
   std::cout << "Initializing Sync" << std::endl;
 
@@ -32,12 +37,14 @@ void Sync::start() {
   // if something is detected then feed to kuramoto model
   // change the led blink phase
   // repeat until an interrupt happens
-  std::size_t num = 5;
-  for (std::size_t i = 0; i < num; i++) {
-    camera_.wait_for_flash();  // blocking call? tbd
-    adjust_phase_kuramoto();   // would calculate a new phase
-    blink_.set_phase(1);       // sample input 1 sec phase
+  while (STATUS == Status::ON) {
+    bool is_detected = camera_.is_flash_detected();  // non-blocking call
+    if (is_detected == true) {
+      adjust_phase_kuramoto();  // would calculate a new phase
+      blink_.set_phase(1);      // sample input 1 sec phase
+    }
   }
+  std::cout << "Exiting Sync" << std::endl;
 }
 
 }  // namespace fireflybot
