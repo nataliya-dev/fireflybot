@@ -1,4 +1,4 @@
-#ifndef FIREFLYBOT_CAMERA_H  // include guard
+#ifndef FIREFLYBOT_CAMERA_H
 #define FIREFLYBOT_CAMERA_H
 
 #include <librealsense2/rs.hpp>

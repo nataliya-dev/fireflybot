@@ -40,9 +40,9 @@ void Camera::save_image(const cv::Mat& cv_img, std::string name) {
 }
 
 bool Camera::detect_blob(const cv::Mat& img) {
-  cv::Mat bwImg;
-  cv::cvtColor(img, bwImg, CV_BGR2GRAY);
-  save_image(bwImg, "bwImg");
+  // cv::Mat bwImg;
+  // cv::cvtColor(img, bwImg, cv::CV_BGR2GRAY);
+  // save_image(bwImg, "bwImg");
 
   // Create a structuring element (SE)
   int morph_size = 1;
@@ -54,18 +54,18 @@ bool Camera::detect_blob(const cv::Mat& img) {
   cv::erode(img, morphedImg, element, cv::Point(-1, -1), 1);
   save_image(morphedImg, "morphedImg");
 
-  cv::Mat blurredImg;
-  cv::blur(morphedImg, blurredImg, cv::Size(8, 8), cv::Point(-1, -1));
-  save_image(blurredImg, "blurredImg");
+  // cv::Mat blurredImg;
+  // cv::blur(morphedImg, blurredImg, cv::Size(8, 8), cv::Point(-1, -1));
+  // save_image(blurredImg, "blurredImg");
 
-  cv::Mat bwImg2;
-  cv::cvtColor(morphedImg, bwImg2, CV_BGR2GRAY);
-  save_image(bwImg2, "bwImg2");
+  // cv::Mat bwImg2;
+  // cv::cvtColor(morphedImg, bwImg2, CV_BGR2GRAY);
+  // save_image(bwImg2, "bwImg2");
 
-  cv::Mat threshImg;
-  cv::adaptiveThreshold(bwImg2, threshImg, 200, cv::ADAPTIVE_THRESH_MEAN_C,
-                        cv::THRESH_BINARY, 3, 2);
-  save_image(threshImg, "threshImg");
+  // cv::Mat threshImg;
+  // cv::adaptiveThreshold(bwImg2, threshImg, 200, cv::ADAPTIVE_THRESH_MEAN_C,
+  //                       cv::THRESH_BINARY, 3, 2);
+  // save_image(threshImg, "threshImg");
 
   // https://learnopencv.com/blob-detection-using-opencv-python-c/
   // Setup SimpleBlobDetector parameters.

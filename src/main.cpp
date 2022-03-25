@@ -18,7 +18,6 @@ int main() {
 
   signal(SIGINT, signalHandler);
 
-  sync = Sync();
   if (sync.initialize() == true) {
     sync.start();
   }

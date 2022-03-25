@@ -1,5 +1,6 @@
 #include "Sync.h"
 
+#include <chrono>
 #include <iostream>
 
 namespace fireflybot {
@@ -22,27 +23,42 @@ bool Sync::initialize() {
   return true;
 }
 
-void Sync::adjust_phase_kuramoto() {
+void Sync::adjust_period_kuramoto() {
   std::cout << "Adjusting phase based on kuramoto model" << std::endl;
-  // insert code based on kuramoto model
   // https://github.com/owingit/fireflysync/blob/master/kuramato_better_sensor/kuramato_better_sensor.ino
+
+  auto detected_tm = std::chrono::high_resolution_clock::now();
+  auto led_trigger_tm = blink_.get_led_trigger_tm();
+  long int elapsed_time_ms =
+      std::chrono::duration<double, std::milli>(detected_tm - led_trigger_tm)
+          .count();
+  long int adjust_ms = 0;
+  long int period = blink_.get_period();
+  if (elapsed_time_ms > period / 2) {
+    adjust_ms = elapsed_time_ms;
+  } else {
+    adjust_ms = elapsed_time_ms - period;
+  }
+
+  adjust_ms /= PHASE_SHIFT_FACTOR;
+  led_trigger_tm += std::chrono::milliseconds(adjust_ms);
+  blink_.set_led_trigger_tm(led_trigger_tm);
+
+  period = adjust_ms / PERIOD_CHANGE_FACTOR;
+  blink_.set_period(period);
+
   return;
 }
 
 void Sync::start() {
   std::cout << "Starting Sync" << std::endl;
 
-  // here we would have the following algorithm:
-  // capture and process image from realsense
-  // if something is detected then feed to kuramoto model
-  // change the led blink phase
-  // repeat until an interrupt happens
   while (STATUS == Status::ON) {
-    bool is_detected = camera_.is_flash_detected();  // non-blocking call
+    bool is_detected = camera_.is_flash_detected();
     if (is_detected == true) {
-      adjust_phase_kuramoto();  // would calculate a new phase
-      blink_.set_phase(1);      // sample input 1 sec phase
+      adjust_period_kuramoto();
     }
+    blink_.blink();
   }
   std::cout << "Exiting Sync" << std::endl;
 }
