@@ -10,4 +10,6 @@ include_directories(include)
 
 add_executable(fireflybot src/main.cpp src/Camera.cpp src/Blink.cpp src/Sync.cpp)
 
-target_link_libraries(${PROJECT_NAME} ${realsense2_LIBRARY} ${OpenCV_LIBS})
+find_library(WIRINGPI_LIBRARIES NAMES wiringPi)
+
+target_link_libraries(${PROJECT_NAME} ${realsense2_LIBRARY} ${OpenCV_LIBS} ${WIRINGPI_LIBRARIES})

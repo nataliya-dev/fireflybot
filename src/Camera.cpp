@@ -103,7 +103,7 @@ bool Camera::detect_blob(const cv::Mat& img) {
                     cv::Scalar(0, 0, 255),
                     cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
-  // cv::imshow("keypoints", im_with_keypoints);
+  // cv::imshow("img", img);
   // cv::waitKey(0);
   save_image(img, "raw");
   save_image(im_with_keypoints, "keypoints");

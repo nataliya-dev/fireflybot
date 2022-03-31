@@ -1,5 +1,7 @@
 #ifndef FIREFLYBOT_BLINK_H
 #define FIREFLYBOT_BLINK_H
+#include <wiringPi.h>
+
 #include <chrono>
 
 namespace fireflybot {
@@ -24,6 +26,8 @@ class Blink {
   void set_period(long int period);
 
  private:
+  const int LED = 29;
+
   const long int INITIAL_SYNC_PERIOD_MS = 700000;
   const long int LED_DURATION_MS = 2000;
   std::chrono::time_point<std::chrono::high_resolution_clock> led_trigger_tm_ =
