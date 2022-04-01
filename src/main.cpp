@@ -19,13 +19,9 @@ int main() {
 
   signal(SIGINT, signalHandler);
 
-  // if (sync.initialize() == true) {
-  //   sync.start();
-  // }
-
-  Blink blinker;
-  blinker.initialize();
-  blinker.test_blink();
+  if (sync.initialize() == true) {
+    sync.start();
+  }
 
   std::cout << "Exiting fireflybot!" << std::endl;
 

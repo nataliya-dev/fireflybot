@@ -6,7 +6,7 @@ namespace fireflybot {
 
 bool Blink::initialize() {
   std::cout << "Initializing Blink" << std::endl;
-  // insert raspberry pi LED initialization here
+  // need to install git@github.com:wbeebe/WiringPi.git
   int ret = wiringPiSetup();
   std::cout << "setup return val: " << ret << std::endl;
   pinMode(LED, OUTPUT);
