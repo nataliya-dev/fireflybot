@@ -1,6 +1,7 @@
 #include "Blink.h"
 
 #include <iostream>
+#include <thread>
 namespace fireflybot {
 
 bool Blink::initialize() {
@@ -23,6 +24,14 @@ void Blink::turn_led_off() {
   is_led_on_ = false;
   digitalWrite(LED, LOW);
   return;
+}
+
+void Blink::test_blink() {
+  while (true) {
+    turn_led_on();
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    turn_led_off();
+  }
 }
 
 long int Blink::get_init_sync_period() { return INITIAL_SYNC_PERIOD_MS; }

@@ -25,6 +25,8 @@ class Blink {
   long int get_period();
   void set_period(long int period);
 
+  void test_blink();
+
  private:
   const int LED = 29;
 

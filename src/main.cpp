@@ -1,6 +1,7 @@
 #include <csignal>
 #include <iostream>
 
+#include "Blink.h"
 #include "Sync.h"
 
 using namespace fireflybot;
@@ -18,9 +19,12 @@ int main() {
 
   signal(SIGINT, signalHandler);
 
-  if (sync.initialize() == true) {
-    sync.start();
-  }
+  // if (sync.initialize() == true) {
+  //   sync.start();
+  // }
+
+  Blink blinker;
+  blinker.test_blink();
 
   std::cout << "Exiting fireflybot!" << std::endl;
 
