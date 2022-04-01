@@ -7,7 +7,8 @@ namespace fireflybot {
 bool Blink::initialize() {
   std::cout << "Initializing Blink" << std::endl;
   // insert raspberry pi LED initialization here
-  wiringPiSetup();
+  int ret = wiringPiSetup();
+  std::cout << "setup return val: " << ret << std::endl;
   pinMode(LED, OUTPUT);
   return true;
 }
@@ -29,8 +30,9 @@ void Blink::turn_led_off() {
 void Blink::test_blink() {
   while (true) {
     turn_led_on();
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     turn_led_off();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 }
 

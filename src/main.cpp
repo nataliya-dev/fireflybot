@@ -24,6 +24,7 @@ int main() {
   // }
 
   Blink blinker;
+  blinker.initialize();
   blinker.test_blink();
 
   std::cout << "Exiting fireflybot!" << std::endl;
