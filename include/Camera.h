@@ -13,6 +13,8 @@ class Camera {
   bool initialize();
   bool is_flash_detected();
 
+  void test_camera();
+
  private:
   rs2::pipeline pipeline_;
 

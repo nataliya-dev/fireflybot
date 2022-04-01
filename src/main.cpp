@@ -1,7 +1,9 @@
+#include <algorithm>
 #include <csignal>
 #include <iostream>
 
 #include "Blink.h"
+#include "Camera.h"
 #include "Sync.h"
 
 using namespace fireflybot;
@@ -14,13 +16,32 @@ void signalHandler(int signum) {
   exit(signum);
 }
 
-int main() {
+bool cmdOptionExists(char** begin, char** end, const std::string& option) {
+  return std::find(begin, end, option) != end;
+}
+
+int main(int argc, char* argv[]) {
   std::cout << "Starting fireflybot!" << std::endl;
 
   signal(SIGINT, signalHandler);
 
-  if (sync.initialize() == true) {
-    sync.start();
+  if (cmdOptionExists(argv, argv + argc, "-tb")) {
+    std::cout << "Testing blinker module" << std::endl;
+    Blink blinker;
+    if (blinker.initialize()) {
+      blinker.test_blink();
+    }
+  } else if (cmdOptionExists(argv, argv + argc, "-tc")) {
+    std::cout << "Testing camera module" << std::endl;
+    Camera camera;
+    if (camera.initialize()) {
+      camera.test_camera();
+    }
+  } else {
+    std::cout << "Running synchonization module" << std::endl;
+    if (sync.initialize() == true) {
+      sync.start();
+    }
   }
 
   std::cout << "Exiting fireflybot!" << std::endl;

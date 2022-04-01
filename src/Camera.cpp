@@ -124,4 +124,10 @@ bool Camera::is_flash_detected() {
   return detect_blob(cv_img);
 }
 
+void Camera::test_camera() {
+  while (true) {
+    is_flash_detected();
+  }
+}
+
 }  // namespace fireflybot

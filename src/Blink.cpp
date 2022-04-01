@@ -6,7 +6,6 @@ namespace fireflybot {
 
 bool Blink::initialize() {
   std::cout << "Initializing Blink" << std::endl;
-  // need to install git@github.com:wbeebe/WiringPi.git
   int ret = wiringPiSetup();
   std::cout << "setup return val: " << ret << std::endl;
   pinMode(LED, OUTPUT);
@@ -72,9 +71,7 @@ void Blink::blink() {
   if (!is_led_on_ && phase_ > period_) {
     turn_led_on();
     led_trigger_tm_ = std::chrono::high_resolution_clock::now();
-  }
-
-  if (is_led_on_ && phase_ > LED_DURATION_MS) {
+  } else if (is_led_on_ && phase_ > LED_DURATION_MS) {
     turn_led_off();
   }
 }
