@@ -43,12 +43,18 @@ void Blink::turn_led_off() {
   return;
 }
 
-void Blink::test_blink() {
+void Blink::test_led() {
   while (true) {
     turn_led_on();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     turn_led_off();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  }
+}
+
+void Blink::test_blink() {
+  while (true) {
+    blink();
   }
 }
 
