@@ -147,9 +147,9 @@ bool Camera::is_light_on(const cv::Mat& img){
   cv::dilate(th_1, th_1, element);
 
   // show processed and original images 
-  cv::imshow("processed", th_1);
-  cv::imshow("unprocessed", getThresh);
-  cv::imshow("og", img);
+//  cv::imshow("processed", th_1);
+//  cv::imshow("unprocessed", getThresh);
+//  cv::imshow("og", img);
 
   // sum over entire processed matrix, looks like around 35000 when detected 
   double s = cv::sum(th_1)[0];

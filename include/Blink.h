@@ -32,7 +32,7 @@ class Blink {
   const int LED = 29;
   const bool IS_SIM = false;
 
-  const long int INITIAL_SYNC_PERIOD_MS = 2500;
+  const long int INITIAL_SYNC_PERIOD_MS = 1500;
   const long int LED_DURATION_MS = 200;
   std::chrono::time_point<std::chrono::high_resolution_clock> led_trigger_tm_ =
       std::chrono::high_resolution_clock::now();
