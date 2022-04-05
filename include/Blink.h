@@ -26,17 +26,19 @@ class Blink {
   void set_period(long int period);
 
   void test_blink();
+  void test_led();
 
  private:
   const int LED = 29;
+  const bool IS_SIM = false;
 
-  const long int INITIAL_SYNC_PERIOD_MS = 700000;
-  const long int LED_DURATION_MS = 2000;
+  const long int INITIAL_SYNC_PERIOD_MS = 2500;
+  const long int LED_DURATION_MS = 200;
   std::chrono::time_point<std::chrono::high_resolution_clock> led_trigger_tm_ =
       std::chrono::high_resolution_clock::now();
 
   long int phase_ = 0;
-  long int period_ = 0;
+  long int period_ = INITIAL_SYNC_PERIOD_MS;
 
   bool is_led_on_ = false;
 

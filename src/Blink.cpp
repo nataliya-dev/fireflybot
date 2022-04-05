@@ -6,15 +6,27 @@ namespace fireflybot {
 
 bool Blink::initialize() {
   std::cout << "Initializing Blink" << std::endl;
+
+  if (IS_SIM) {
+    std::cout << "Blink simulation mode." << std::endl;
+    return true;
+  }
+
   int ret = wiringPiSetup();
   std::cout << "setup return val: " << ret << std::endl;
   pinMode(LED, OUTPUT);
+
   return true;
 }
 
 void Blink::turn_led_on() {
   std::cout << "LED on" << std::endl;
   is_led_on_ = true;
+
+  if (IS_SIM) {
+    return;
+  }
+
   digitalWrite(LED, HIGH);
   return;
 }
@@ -22,16 +34,27 @@ void Blink::turn_led_on() {
 void Blink::turn_led_off() {
   std::cout << "LED off" << std::endl;
   is_led_on_ = false;
+
+  if (IS_SIM) {
+    return;
+  }
+
   digitalWrite(LED, LOW);
   return;
 }
 
-void Blink::test_blink() {
+void Blink::test_led() {
   while (true) {
     turn_led_on();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     turn_led_off();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  }
+}
+
+void Blink::test_blink() {
+  while (true) {
+    blink();
   }
 }
 
@@ -55,7 +78,8 @@ void Blink::calc_phase() {
   long int elapsed_time_ms =
       std::chrono::duration<double, std::milli>(now_tm - led_trigger_tm_)
           .count();
-  if (elapsed_time_ms > 0) {
+  // std::cout << "elapsed_time_ms: " << elapsed_time_ms << std::endl;
+  if (elapsed_time_ms < 0) {
     phase_ = 0;
   }
   phase_ = elapsed_time_ms;
@@ -71,8 +95,13 @@ void Blink::blink() {
   if (!is_led_on_ && phase_ > period_) {
     turn_led_on();
     led_trigger_tm_ = std::chrono::high_resolution_clock::now();
+    std::cout << "phase_: " << phase_ << std::endl;
+    std::cout << "period_: " << period_ << std::endl;
+
   } else if (is_led_on_ && phase_ > LED_DURATION_MS) {
     turn_led_off();
+    std::cout << "phase_: " << phase_ << std::endl;
+    std::cout << "period_: " << period_ << std::endl;
   }
 }
 

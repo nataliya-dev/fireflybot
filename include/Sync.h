@@ -19,7 +19,7 @@ class Sync {
   static Status STATUS;
 
  private:
-  const int PHASE_SHIFT_FACTOR = 20;
+  const int PHASE_SHIFT_FACTOR = 2;
   const int PERIOD_CHANGE_FACTOR = 5;
 
   Camera camera_;

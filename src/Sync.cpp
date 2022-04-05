@@ -32,19 +32,28 @@ void Sync::adjust_period_kuramoto() {
   long int elapsed_time_ms =
       std::chrono::duration<double, std::milli>(detected_tm - led_trigger_tm)
           .count();
+  std::cout << "elapsed_time_ms: " << elapsed_time_ms << std::endl;
+
   long int adjust_ms = 0;
   long int period = blink_.get_period();
-  if (elapsed_time_ms > period / 2) {
+  std::cout << "period: " << period << std::endl;
+
+  if (elapsed_time_ms < period / 2) {
     adjust_ms = elapsed_time_ms;
   } else {
     adjust_ms = elapsed_time_ms - period;
   }
+  std::cout << "adjust_ms: " << adjust_ms << std::endl;
 
-  adjust_ms /= PHASE_SHIFT_FACTOR;
-  led_trigger_tm += std::chrono::milliseconds(adjust_ms);
+  long int phase_adjust_ms = adjust_ms / PHASE_SHIFT_FACTOR;
+  std::cout << "phase_adjust_ms: " << phase_adjust_ms << std::endl;
+  led_trigger_tm += std::chrono::milliseconds(phase_adjust_ms);
   blink_.set_led_trigger_tm(led_trigger_tm);
 
-  period = adjust_ms / PERIOD_CHANGE_FACTOR;
+  long int period_adjust_ms = adjust_ms / PERIOD_CHANGE_FACTOR;
+  period = period + period_adjust_ms;
+  std::cout << "period_adjust_ms: " << period_adjust_ms << std::endl;
+  std::cout << "new period: " << period << std::endl;
   blink_.set_period(period);
 
   return;

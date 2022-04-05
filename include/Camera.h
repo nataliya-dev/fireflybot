@@ -1,6 +1,7 @@
 #ifndef FIREFLYBOT_CAMERA_H
 #define FIREFLYBOT_CAMERA_H
 
+#include <chrono>
 #include <librealsense2/rs.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -18,6 +19,11 @@ class Camera {
   void test_camera();
 
  private:
+  const bool IS_SIM = false;
+  const int SIM_DETECT_PERIOD_MS = 1000;
+  std::chrono::time_point<std::chrono::high_resolution_clock> sim_detect_tm_ =
+      std::chrono::high_resolution_clock::now();
+
   rs2::pipeline pipeline_;
 
   void set_config(rs2::config& config);

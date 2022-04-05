@@ -5,6 +5,10 @@
 namespace fireflybot {
 bool Camera::initialize() {
   std::cout << "Initializing Camera" << std::endl;
+  if (IS_SIM) {
+    return true;
+  }
+
   rs2::config config;
   set_config(config);
   pipeline_.start(config);
@@ -163,8 +167,28 @@ bool Camera::is_light_on(const cv::Mat& img){
 }
 
 bool Camera::is_flash_detected() {
+<<<<<<< HEAD
   std::cout << "Checking for firefly flash" << std::endl;
   // cv::Mat cv_img;
+=======
+  // std::cout << "Checking for firefly flash" << std::endl;
+
+  if (IS_SIM) {
+    auto now_tm = std::chrono::high_resolution_clock::now();
+    long int sim_since_flash_detect_ms =
+        std::chrono::duration<double, std::milli>(now_tm - sim_detect_tm_)
+            .count();
+    // std::cout << "sim_since_flash_detect_ms: " << sim_since_flash_detect_ms
+    //           << std::endl;
+    if (sim_since_flash_detect_ms > SIM_DETECT_PERIOD_MS) {
+      std::cout << "Flash detected!" << std::endl;
+      sim_detect_tm_ = std::chrono::high_resolution_clock::now();
+      return true;
+    } else {
+      return false;
+    }
+  }
+>>>>>>> 239890119e6d8f289b6498b51deb8405835de7a2
 
   rs2::frameset frames = pipeline_.wait_for_frames();
   rs2::video_frame color_frame = frames.get_color_frame();
