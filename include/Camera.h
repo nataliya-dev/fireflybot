@@ -3,6 +3,8 @@
 
 #include <librealsense2/rs.hpp>
 #include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
 
 namespace fireflybot {
 class Camera {
@@ -22,6 +24,7 @@ class Camera {
   cv::Mat convert_to_opencv(const rs2::video_frame& color_frame);
   void save_image(const cv::Mat& cv_img, std::string name);
   bool detect_blob(const cv::Mat& img);
+  bool is_light_on(const cv::Mat& img);
 };
 
 }  // namespace fireflybot

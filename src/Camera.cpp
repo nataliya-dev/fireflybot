@@ -39,6 +39,8 @@ void Camera::save_image(const cv::Mat& cv_img, std::string name) {
   }
 }
 
+
+
 bool Camera::detect_blob(const cv::Mat& img) {
   // cv::Mat bwImg;
   // cv::cvtColor(img, bwImg, cv::CV_BGR2GRAY);
@@ -105,8 +107,8 @@ bool Camera::detect_blob(const cv::Mat& img) {
 
   // cv::imshow("img", img);
   // cv::waitKey(0);
-  save_image(img, "raw");
-  save_image(im_with_keypoints, "keypoints");
+  // save_image(img, "raw");
+  // save_image(im_with_keypoints, "keypoints");
 
   if (keypoints.size() == 0) {
     return false;
@@ -115,18 +117,66 @@ bool Camera::detect_blob(const cv::Mat& img) {
   return true;
 }
 
+bool Camera::is_light_on(const cv::Mat& img){
+
+  cv::Mat greyMat;
+  cv::Mat getThresh;
+  cv::Mat th_1; 
+  cv::Mat th_2;
+
+  // convert to grayscale 
+  cv::cvtColor(img, greyMat, cv::COLOR_BGR2GRAY);
+
+  // set threshold
+  cv::threshold( greyMat, getThresh, 80,255, 0);
+
+  int rect = 0;
+  int k_size = 1;
+
+  // calculate kernel for erosion & dilation 
+  cv::Mat element = cv::getStructuringElement( rect,
+                    cv::Size( 2*k_size + 1, 2*k_size+1 ),
+                    cv::Point( k_size, k_size ));
+
+  // processing
+  cv::erode(getThresh, th_1,  element);
+  cv::dilate(th_1, th_1, element);
+
+  // show processed and original images 
+  cv::imshow("processed", th_1);
+  cv::imshow("unprocessed", getThresh);
+  cv::imshow("og", img);
+
+  // sum over entire processed matrix, looks like around 35000 when detected 
+  double s = cv::sum(th_1)[0];
+  
+  // setting the threshold around 20000 
+  bool light_on = false;
+  double sum_threshold = 20000;
+  if (s > sum_threshold) {
+    light_on = true;
+  }
+
+  // cv::waitKey(1);
+  return light_on;
+
+}
+
 bool Camera::is_flash_detected() {
   std::cout << "Checking for firefly flash" << std::endl;
+  // cv::Mat cv_img;
 
   rs2::frameset frames = pipeline_.wait_for_frames();
   rs2::video_frame color_frame = frames.get_color_frame();
   cv::Mat cv_img = convert_to_opencv(color_frame);
-  return detect_blob(cv_img);
+  
+  return is_light_on(cv_img);
+
 }
 
 void Camera::test_camera() {
   while (true) {
-    is_flash_detected();
+    std::cout << is_flash_detected() << std::endl; 
   }
 }
 
