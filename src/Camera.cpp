@@ -169,7 +169,7 @@ bool Camera::is_flash_detected() {
         std::chrono::duration<double, std::milli>(now_tm - sim_detect_tm_)
             .count();
     if (sim_since_flash_detect_ms > SIM_DETECT_PERIOD_MS) {
-      std::cout << "Flash detected!" << std::endl;
+      std::cout << "\nFlash detected!" << std::endl;
       sim_detect_tm_ = std::chrono::high_resolution_clock::now();
       return true;
     } else {

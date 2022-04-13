@@ -2,7 +2,6 @@
 
 #include <chrono>
 #include <iostream>
-
 namespace fireflybot {
 
 Status Sync::STATUS = Status::ON;
@@ -21,6 +20,10 @@ bool Sync::initialize() {
   }
 
   return true;
+}
+
+long int Sync::clip(long int n, long int lower, long int upper) {
+  return std::max(lower, std::min(n, upper));
 }
 
 void Sync::adjust_period_kuramoto() {
@@ -50,9 +53,18 @@ void Sync::adjust_period_kuramoto() {
   led_trigger_tm += std::chrono::milliseconds(phase_adjust_ms);
   blink_.set_led_trigger_tm(led_trigger_tm);
 
+  elapsed_time_ms =
+      std::chrono::duration<double, std::milli>(detected_tm - led_trigger_tm)
+          .count();
+  std::cout << "new elapsed_time_ms: " << elapsed_time_ms << std::endl;
+
   long int period_adjust_ms = adjust_ms / PERIOD_CHANGE_FACTOR;
-  period = period + period_adjust_ms;
   std::cout << "period_adjust_ms: " << period_adjust_ms << std::endl;
+  period += period_adjust_ms;
+  period = clip(
+      period, blink_.get_init_sync_period() - blink_.get_init_sync_period() / 2,
+      blink_.get_init_sync_period() + blink_.get_init_sync_period() / 2);
+
   std::cout << "new period: " << period << std::endl;
   blink_.set_period(period);
 

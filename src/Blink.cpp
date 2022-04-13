@@ -20,7 +20,7 @@ bool Blink::initialize() {
 }
 
 void Blink::turn_led_on() {
-  std::cout << "LED on" << std::endl;
+  std::cout << "\nLED on" << std::endl;
   is_led_on_ = true;
 
   if (IS_SIM) {
@@ -32,7 +32,7 @@ void Blink::turn_led_on() {
 }
 
 void Blink::turn_led_off() {
-  std::cout << "LED off" << std::endl;
+  std::cout << "\nLED off" << std::endl;
   is_led_on_ = false;
 
   if (IS_SIM) {

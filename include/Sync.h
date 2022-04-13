@@ -26,6 +26,7 @@ class Sync {
   Blink blink_;
 
   void adjust_period_kuramoto();
+  long int clip(long int n, long int lower, long int upper);
 };
 }  // namespace fireflybot
 
