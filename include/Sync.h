@@ -25,6 +25,9 @@ class Sync {
   Camera camera_;
   Blink blink_;
 
+  const std::string saved_data_filename = "data.csv";
+  // https://www.gormanalysis.com/blog/reading-and-writing-csv-files-with-cpp/
+
   void adjust_period_kuramoto();
   long int clip(long int n, long int lower, long int upper);
 };

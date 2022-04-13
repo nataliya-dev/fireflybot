@@ -1,6 +1,7 @@
 #include "Sync.h"
 
 #include <chrono>
+#include <fstream>
 #include <iostream>
 namespace fireflybot {
 
