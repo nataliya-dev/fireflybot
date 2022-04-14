@@ -184,9 +184,15 @@ bool Camera::is_flash_detected() {
   return is_light_on(cv_img);
 }
 
+// Just update when a change is detected
 void Camera::test_camera() {
+  bool detected = false;
   while (true) {
-    std::cout << is_flash_detected() << std::endl;
+    bool check = is_flash_detected();
+    if (check != detected){
+      detected = check;
+      std::cout << detected << std::endl;
+    }
   }
 }
 
