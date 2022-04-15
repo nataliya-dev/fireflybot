@@ -151,7 +151,7 @@ bool Camera::is_light_on(const cv::Mat& img) {
   // sum over entire processed matrix, looks like around 35000 when detected
   double s = cv::sum(th_1)[0];
 
-  // setting the threshold around 4000, based on outputting 
+  // setting the threshold around 4000, based on outputting
   // sum over filtered matrix and observing sums generated from flashes
   bool light_on = false;
   // std::cout << s << std::endl;
@@ -183,7 +183,14 @@ bool Camera::is_flash_detected() {
   rs2::video_frame color_frame = frames.get_color_frame();
   cv::Mat cv_img = convert_to_opencv(color_frame);
 
-  return is_light_on(cv_img);
+  bool status_change = is_light_on(cv_img);
+  if (status_change != prev_led_stat_) {
+    prev_led_stat_ = status_change;
+    std::cout << prev_led_stat_ << std::endl;
+    return prev_led_stat_;
+  }
+
+  return false;
 }
 
 // Just update when a change is detected
@@ -191,10 +198,6 @@ void Camera::test_camera() {
   bool detected = false;
   while (true) {
     bool check = is_flash_detected();
-    if (check != detected){
-      detected = check;
-      std::cout << detected << std::endl;
-    }
   }
 }
 
