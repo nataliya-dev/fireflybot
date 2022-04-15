@@ -10,7 +10,7 @@ Fireflybot mimics the synchonization patterns of fireflies with electronic compo
 - Ubuntu MATE Version 20.04.4 LTS Focal Fossa arm64 system
 - Intel® RealSense™ SDK 2.0 (v2.50.0)
 - OpenCV (Open Source Computer Vision Library) (v4.2.0)
-- WiringPi (https://github.com/wbeebe/rpi)
+- WiringPi (https://github.com/wbeebe/WiringPi)
 
 ## Usage
 Clone the project into your desired director then build the project.

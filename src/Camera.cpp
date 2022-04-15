@@ -5,7 +5,7 @@
 namespace fireflybot {
 bool Camera::initialize() {
   std::cout << "Initializing Camera" << std::endl;
-  if (IS_SIM) {
+  if (is_sim_) {
     return true;
   }
 
@@ -163,7 +163,7 @@ bool Camera::is_light_on(const cv::Mat& img) {
 }
 
 bool Camera::is_flash_detected() {
-  if (IS_SIM) {
+  if (is_sim_) {
     auto now_tm = std::chrono::high_resolution_clock::now();
     long int sim_since_flash_detect_ms =
         std::chrono::duration<double, std::milli>(now_tm - sim_detect_tm_)
@@ -195,5 +195,7 @@ void Camera::test_camera() {
     }
   }
 }
+
+void Camera::set_sim_mode(bool is_sim) { is_sim_ = is_sim; }
 
 }  // namespace fireflybot

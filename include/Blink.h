@@ -28,9 +28,11 @@ class Blink {
   void test_blink();
   void test_led();
 
+  void set_sim_mode(bool is_sim);
+
  private:
   const int LED = 29;
-  const bool IS_SIM = false;
+  bool is_sim_ = false;
 
   const long int INITIAL_SYNC_PERIOD_MS = 1400;
   const long int LED_DURATION_MS = 200;

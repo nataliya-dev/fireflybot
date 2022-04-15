@@ -7,7 +7,7 @@ namespace fireflybot {
 bool Blink::initialize() {
   std::cout << "Initializing Blink" << std::endl;
 
-  if (IS_SIM) {
+  if (is_sim_) {
     std::cout << "Blink simulation mode." << std::endl;
     return true;
   }
@@ -23,7 +23,7 @@ void Blink::turn_led_on() {
   std::cout << "\nLED on" << std::endl;
   is_led_on_ = true;
 
-  if (IS_SIM) {
+  if (is_sim_) {
     return;
   }
 
@@ -35,7 +35,7 @@ void Blink::turn_led_off() {
   std::cout << "\nLED off" << std::endl;
   is_led_on_ = false;
 
-  if (IS_SIM) {
+  if (is_sim_) {
     return;
   }
 
@@ -104,5 +104,7 @@ void Blink::blink() {
     std::cout << "period_: " << period_ << std::endl;
   }
 }
+
+void Blink::set_sim_mode(bool is_sim) { is_sim_ = is_sim; }
 
 }  // namespace fireflybot

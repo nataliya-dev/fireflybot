@@ -17,8 +17,10 @@ class Camera {
 
   void test_camera();
 
+  void set_sim_mode(bool is_sim);
+
  private:
-  const bool IS_SIM = false;
+  bool is_sim_ = false;
   const int SIM_DETECT_PERIOD_MS = 1000;
   std::chrono::time_point<std::chrono::high_resolution_clock> sim_detect_tm_ =
       std::chrono::high_resolution_clock::now();
