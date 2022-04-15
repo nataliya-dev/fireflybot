@@ -18,18 +18,25 @@ class Sync {
 
   static Status STATUS;
 
+  void set_sim_mode(bool is_sim);
+
  private:
   const int PHASE_SHIFT_FACTOR = 3;
   const int PERIOD_CHANGE_FACTOR = 7;
 
+  long int num_flashes_ = 0;
+
   Camera camera_;
   Blink blink_;
 
-  const std::string saved_data_filename = "data.csv";
-  // https://www.gormanalysis.com/blog/reading-and-writing-csv-files-with-cpp/
+  const std::string saved_data_filename_ = "../scripts/sync_data.csv";
 
-  void adjust_period_kuramoto();
   long int clip(long int n, long int lower, long int upper);
+  void adjust_period_kuramoto();
+  void adjust_period_integrate_fire();
+
+  void init_record_header();
+  void record_data(const std::vector<long int>& data);
 };
 }  // namespace fireflybot
 

@@ -37,6 +37,12 @@ int main(int argc, char* argv[]) {
     if (camera.initialize()) {
       camera.test_camera();
     }
+  } else if (cmdOptionExists(argv, argv + argc, "-sim")) {
+    std::cout << "Fireflybot simulation mode" << std::endl;
+    sync.set_sim_mode(true);
+    if (sync.initialize() == true) {
+      sync.start();
+    }
   } else {
     std::cout << "Running synchonization module" << std::endl;
     if (sync.initialize() == true) {
