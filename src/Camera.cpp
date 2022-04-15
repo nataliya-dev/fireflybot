@@ -151,9 +151,11 @@ bool Camera::is_light_on(const cv::Mat& img) {
   // sum over entire processed matrix, looks like around 35000 when detected
   double s = cv::sum(th_1)[0];
 
-  // setting the threshold around 20000
+  // setting the threshold around 4000, based on outputting 
+  // sum over filtered matrix and observing sums generated from flashes
   bool light_on = false;
-  double sum_threshold = 20000;
+  // std::cout << s << std::endl;
+  double sum_threshold = 4000;
   if (s > sum_threshold) {
     light_on = true;
   }
