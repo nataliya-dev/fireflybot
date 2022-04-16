@@ -25,6 +25,7 @@ class Sync {
   const int PERIOD_CHANGE_FACTOR = 7;
 
   long int num_flashes_ = 0;
+  long int detect_tm_ms_ = 0;
 
   Camera camera_;
   Blink blink_;

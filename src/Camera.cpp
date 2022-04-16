@@ -149,55 +149,82 @@ bool Camera::is_light_on(const cv::Mat& img) {
   //  cv::imshow("og", img);
 
   // sum over entire processed matrix, looks like around 35000 when detected
-  double s = cv::sum(th_1)[0];
+  double current_sum = cv::sum(th_1)[0];
 
   // setting the threshold around 4000, based on outputting
   // sum over filtered matrix and observing sums generated from flashes
-  bool light_on = false;
+
   // std::cout << s << std::endl;
-  double sum_threshold = 4000;
-  if (s > sum_threshold) {
-    light_on = true;
+
+  // if two frames in a row detect a light sum larger than threshold
+  // then led is detected, else ignore and return false
+
+  if (current_sum > DETECT_THRESH && num_light_frames_ == 0) {
+    num_light_frames_++;
+    return false;
+  } else if (current_sum > DETECT_THRESH && num_light_frames_ == 1) {
+    std::cout << "\nFlash detected!" << std::endl;
+    num_light_frames_++;
+    return true;
+  } else if (current_sum > DETECT_THRESH && num_light_frames_ > 1) {
+    num_light_frames_++;
+    return false;
+  } else {
+    num_light_frames_ = 0;
+    return false;
   }
 
   // cv::waitKey(1);
-  return light_on;
 }
 
-bool Camera::is_flash_detected() {
+bool Camera::is_sim_flash() {
+  bool is_detected = false;
+
+  auto now_tm = std::chrono::high_resolution_clock::now();
+  long int sim_since_flash_detect_ms =
+      std::chrono::duration<double, std::milli>(now_tm - sim_detect_tm_)
+          .count();
+  if (sim_since_flash_detect_ms > SIM_DETECT_PERIOD_MS) {
+    std::cout << "\nFlash detected!" << std::endl;
+    sim_detect_tm_ = std::chrono::high_resolution_clock::now();
+    is_detected = true;
+  } else {
+    is_detected = false;
+  }
+  return is_detected;
+}
+
+bool Camera::is_flash_detected(long int& detect_tm_ms) {
+  auto start_detect_tm = std::chrono::high_resolution_clock::now();
+  bool is_detected = false;
+
   if (is_sim_) {
-    auto now_tm = std::chrono::high_resolution_clock::now();
-    long int sim_since_flash_detect_ms =
-        std::chrono::duration<double, std::milli>(now_tm - sim_detect_tm_)
-            .count();
-    if (sim_since_flash_detect_ms > SIM_DETECT_PERIOD_MS) {
-      std::cout << "\nFlash detected!" << std::endl;
-      sim_detect_tm_ = std::chrono::high_resolution_clock::now();
-      return true;
-    } else {
-      return false;
-    }
+    is_detected = is_sim_flash();
+  } else {
+    rs2::frameset frames = pipeline_.wait_for_frames();
+    rs2::video_frame color_frame = frames.get_color_frame();
+    cv::Mat cv_img = convert_to_opencv(color_frame);
+    is_detected = is_light_on(cv_img);
   }
 
-  rs2::frameset frames = pipeline_.wait_for_frames();
-  rs2::video_frame color_frame = frames.get_color_frame();
-  cv::Mat cv_img = convert_to_opencv(color_frame);
-
-  bool status_change = is_light_on(cv_img);
-  if (status_change != prev_led_stat_) {
-    prev_led_stat_ = status_change;
-    std::cout << prev_led_stat_ << std::endl;
-    return prev_led_stat_;
-  }
-
-  return false;
+  auto end_detect_tm = std::chrono::high_resolution_clock::now();
+  detect_tm_ms =
+      std::chrono::duration<double, std::milli>(start_detect_tm - end_detect_tm)
+          .count();
+  detect_tm_ms *= 2;
+  return is_detected;
 }
 
 // Just update when a change is detected
 void Camera::test_camera() {
   bool detected = false;
   while (true) {
-    bool check = is_flash_detected();
+    long int detect_tm_ms = 0;
+    bool is_detected = is_flash_detected(detect_tm_ms);
+    if (is_detected) {
+      std::cout << "is_detected: " << is_detected << std::endl;
+      std::cout << "detect_tm_ms: " << detect_tm_ms << std::endl;
+    }
   }
 }
 

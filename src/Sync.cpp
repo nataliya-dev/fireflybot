@@ -38,6 +38,8 @@ void Sync::adjust_period_kuramoto() {
   num_flashes_++;
 
   auto detected_tm = std::chrono::high_resolution_clock::now();
+  detected_tm -= std::chrono::milliseconds(detect_tm_ms_);
+  std::cout << "detect_tm_ms_: " << detect_tm_ms_ << std::endl;
   auto led_trigger_tm = blink_.get_led_trigger_tm();
   long int elapsed_time_ms =
       std::chrono::duration<double, std::milli>(detected_tm - led_trigger_tm)
@@ -90,7 +92,7 @@ void Sync::start() {
   std::cout << "Starting Sync" << std::endl;
 
   while (STATUS == Status::ON) {
-    bool is_detected = camera_.is_flash_detected();
+    bool is_detected = camera_.is_flash_detected(detect_tm_ms_);
     if (is_detected == true) {
       adjust_period_kuramoto();
     }

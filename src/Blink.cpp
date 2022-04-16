@@ -92,7 +92,7 @@ long int Blink::get_phase() {
 
 void Blink::blink() {
   calc_phase();
-  if (!is_led_on_ && phase_ > period_) {
+  if (!is_led_on_ && phase_ > period_ + LED_DURATION_MS / 2) {
     turn_led_on();
     led_trigger_tm_ = std::chrono::high_resolution_clock::now();
     std::cout << "phase_: " << phase_ << std::endl;
