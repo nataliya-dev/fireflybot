@@ -21,8 +21,8 @@ class Sync {
   void set_sim_mode(bool is_sim);
 
  private:
-  const int PHASE_SHIFT_FACTOR = 3;
-  const int PERIOD_CHANGE_FACTOR = 7;
+  const int PHASE_SHIFT_FACTOR = 5;
+  const int PERIOD_CHANGE_FACTOR = 6;
 
   long int num_flashes_ = 0;
   long int detect_tm_ms_ = 0;

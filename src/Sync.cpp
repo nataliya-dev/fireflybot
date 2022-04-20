@@ -70,9 +70,9 @@ void Sync::adjust_period_kuramoto() {
   long int period_adjust_ms = adjust_ms / PERIOD_CHANGE_FACTOR;
   std::cout << "period_adjust_ms: " << period_adjust_ms << std::endl;
   period += period_adjust_ms;
-  period = clip(
-      period, blink_.get_init_sync_period() - blink_.get_init_sync_period() / 2,
-      blink_.get_init_sync_period() + blink_.get_init_sync_period() / 2);
+  // period = clip(
+  //     period, blink_.get_init_sync_period() - blink_.get_init_sync_period() /
+  //     2, blink_.get_init_sync_period() + blink_.get_init_sync_period() / 2);
 
   std::cout << "new period: " << period << std::endl;
   blink_.set_period(period);
@@ -94,7 +94,12 @@ void Sync::start() {
   while (STATUS == Status::ON) {
     bool is_detected = camera_.is_flash_detected(detect_tm_ms_);
     if (is_detected == true) {
+      auto start_tm = std::chrono::high_resolution_clock::now();
       adjust_period_kuramoto();
+      auto end_tm = std::chrono::high_resolution_clock::now();
+      auto adjust_tm_ms =
+          std::chrono::duration<double, std::milli>(end_tm - start_tm).count();
+      std::cout << "adjust_tm_ms: " << adjust_tm_ms << std::endl;
     }
     blink_.blink();
   }
