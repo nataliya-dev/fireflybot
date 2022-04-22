@@ -209,7 +209,7 @@ bool Camera::is_flash_detected(long int& detect_tm_ms) {
 
   auto end_detect_tm = std::chrono::high_resolution_clock::now();
   detect_tm_ms =
-      std::chrono::duration<double, std::milli>(start_detect_tm - end_detect_tm)
+      std::chrono::duration<double, std::milli>(end_detect_tm - start_detect_tm)
           .count();
   detect_tm_ms *= 2;
   return is_detected;
