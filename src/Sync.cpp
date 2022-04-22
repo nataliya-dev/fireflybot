@@ -2,7 +2,10 @@
 
 #include <chrono>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
+
 namespace fireflybot {
 
 Status Sync::STATUS = Status::ON;
@@ -106,10 +109,23 @@ void Sync::start() {
   std::cout << "Exiting Sync" << std::endl;
 }
 
+std::string Sync::serialize_time_point(const time_point& time,
+                                       const std::string& format) {
+  std::time_t tt = std::chrono::system_clock::to_time_t(time);
+  std::tm tm = *std::gmtime(&tt);  // GMT (UTC)
+  // std::tm tm = *std::localtime(&tt); //Locale time-zone, usually UTC by
+  // default.
+  std::stringstream ss;
+  ss << std::put_time(&tm, format.c_str());
+  return ss.str();
+}
+
 void Sync::init_record_header() {
   std::ofstream file(saved_data_filename_);
   if (!file.is_open()) throw std::runtime_error("Could not open record file");
-  file << "num_flashes"
+  file << "time"
+       << ","
+       << "num_flashes"
        << ","
        << "period"
        << ","
@@ -125,6 +141,9 @@ void Sync::record_data(const std::vector<long int>& data) {
   std::ofstream file(saved_data_filename_, std::fstream::app);
 
   std::size_t num_data_pts = data.size();
+  auto tm = std::chrono::high_resolution_clock::now();
+  std::string tm_str = serialize_time_point(tm, time_format_);
+  file << tm_str << ",";
   for (std::size_t i = 0; i < num_data_pts; i++) {
     if (i == num_data_pts - 1) {
       file << data[i] << "\n";

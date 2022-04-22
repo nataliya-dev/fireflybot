@@ -4,6 +4,7 @@
 #include "Blink.h"
 #include "Camera.h"
 
+using time_point = std::chrono::system_clock::time_point;
 namespace fireflybot {
 
 enum class Status { ON = 0, OFF };
@@ -31,6 +32,7 @@ class Sync {
   Blink blink_;
 
   const std::string saved_data_filename_ = "../scripts/sync_data.csv";
+  const std::string time_format_ = "%Y-%m-%d %H:%M:%S";
 
   long int clip(long int n, long int lower, long int upper);
   void adjust_period_kuramoto();
@@ -38,6 +40,8 @@ class Sync {
 
   void init_record_header();
   void record_data(const std::vector<long int>& data);
+  std::string serialize_time_point(const time_point& time,
+                                   const std::string& format);
 };
 }  // namespace fireflybot
 

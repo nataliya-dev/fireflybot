@@ -33,6 +33,11 @@ To test the camera module:
 ./fireflybot -tc
 ```
 
+To test the hardware-free synchronization module:
+```
+./fireflybot -sim
+```
+
 Once all the components are connected and tested separately, you can run the synchonization module.
 ```
 sudo ./fireflybot
