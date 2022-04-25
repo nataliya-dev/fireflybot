@@ -12,7 +12,8 @@ class Blink {
 
   bool initialize();
 
-  void blink();
+  void phase_blink();
+  void burst_blink();
 
   long int get_phase();
   long int get_init_sync_period();
@@ -25,8 +26,8 @@ class Blink {
   long int get_period();
   void set_period(long int period);
 
-  void test_blink();
-  void test_led();
+  void test_burst_blink();
+  void test_phase_blink();
 
   void set_sim_mode(bool is_sim);
 

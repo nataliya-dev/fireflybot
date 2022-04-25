@@ -43,19 +43,24 @@ void Blink::turn_led_off() {
   return;
 }
 
-void Blink::test_led() {
+void Blink::test_burst_blink() {
   while (true) {
-    turn_led_on();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    turn_led_off();
+    burst_blink();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 }
 
-void Blink::test_blink() {
+void Blink::test_phase_blink() {
   while (true) {
-    blink();
+    phase_blink();
   }
+}
+
+void Blink::burst_blink() {
+  turn_led_on();
+  led_trigger_tm_ = std::chrono::high_resolution_clock::now();
+  std::this_thread::sleep_for(std::chrono::milliseconds(LED_DURATION_MS));
+  turn_led_off();
 }
 
 long int Blink::get_init_sync_period() { return INITIAL_SYNC_PERIOD_MS; }
@@ -90,7 +95,7 @@ long int Blink::get_phase() {
   return phase_;
 }
 
-void Blink::blink() {
+void Blink::phase_blink() {
   calc_phase();
   if (!is_led_on_ && phase_ > period_) {
     turn_led_on();

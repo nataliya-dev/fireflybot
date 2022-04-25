@@ -1,14 +1,15 @@
 #include "Sync.h"
 
+#include <algorithm>
 #include <chrono>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-
 namespace fireflybot {
 
 Status Sync::STATUS = Status::ON;
+Model Sync::MODEL = Model::KURAMOTO;
 
 Sync::Sync() {}
 
@@ -23,8 +24,6 @@ bool Sync::initialize() {
     return false;
   }
 
-  init_record_header();
-
   return true;
 }
 
@@ -32,7 +31,29 @@ long int Sync::clip(long int n, long int lower, long int upper) {
   return std::max(lower, std::min(n, upper));
 }
 
-void Sync::adjust_period_integrate_fire() {}
+void Sync::integrate_fire(bool is_detected) {
+  // https://github.com/owingit/fireflysync/blob/master/integrate_and_fire/integrate_and_fire.ino
+
+  // MODEL params-----
+  double I = 1.0;
+  double eta = 1.0;
+  double beta = 0.65;
+  double N = 10.0;
+  double N_mult = 500.0;
+
+  if (is_detected) {
+    num_flashes_++;
+    Voltage_ = std::min(1.0, Voltage_ + (beta / N));
+  } else {
+    double dV = I - eta * Voltage_;
+    // std::cout << "dV: " << dV << std::endl;
+    Voltage_ = Voltage_ + (dV / (N_mult * N));
+  }
+  // std::cout << "Voltage: " << Voltage_ << std::endl;
+  // std::cout << "Phase: " << blink_.get_phase() << std::endl;
+
+  record_data();
+}
 
 void Sync::adjust_period_kuramoto() {
   std::cout << "Adjusting phase based on kuramoto model" << std::endl;
@@ -93,47 +114,95 @@ void Sync::adjust_period_kuramoto() {
 
 void Sync::start() {
   std::cout << "Starting Sync" << std::endl;
+  init_record_header();
 
   while (STATUS == Status::ON) {
     bool is_detected = camera_.is_flash_detected(detect_tm_ms_);
-    if (is_detected == true) {
-      auto start_tm = std::chrono::high_resolution_clock::now();
-      adjust_period_kuramoto();
-      auto end_tm = std::chrono::high_resolution_clock::now();
-      auto adjust_tm_ms =
-          std::chrono::duration<double, std::milli>(end_tm - start_tm).count();
-      std::cout << "adjust_tm_ms: " << adjust_tm_ms << std::endl;
+
+    switch (MODEL) {
+      case Model::KURAMOTO: {
+        if (is_detected == true) {
+          auto start_tm = std::chrono::high_resolution_clock::now();
+          adjust_period_kuramoto();
+          auto end_tm = std::chrono::high_resolution_clock::now();
+          auto adjust_tm_ms =
+              std::chrono::duration<double, std::milli>(end_tm - start_tm)
+                  .count();
+          std::cout << "adjust_tm_ms: " << adjust_tm_ms << std::endl;
+        }
+        blink_.phase_blink();
+      } break;
+      case Model::INTEGRATE_AND_FIRE: {
+        integrate_fire(is_detected);
+        if (Voltage_ >= 0.999) {
+          blink_.burst_blink();
+          Voltage_ = 0.0;
+        }
+      } break;
     }
-    blink_.blink();
   }
+
   std::cout << "Exiting Sync" << std::endl;
 }
 
 std::string Sync::serialize_time_point(const time_point& time,
                                        const std::string& format) {
   std::time_t tt = std::chrono::system_clock::to_time_t(time);
-  std::tm tm = *std::gmtime(&tt);  // GMT (UTC)
-  // std::tm tm = *std::localtime(&tt); //Locale time-zone, usually UTC by
-  // default.
+  // std::tm tm = *std::gmtime(&tt);  // GMT (UTC)
+  std::tm tm = *std::localtime(&tt);
+  auto ms =
+      std::chrono::duration_cast<std::chrono::milliseconds>(
+          time.time_since_epoch()) -
+      std::chrono::duration_cast<std::chrono::seconds>(time.time_since_epoch());
   std::stringstream ss;
   ss << std::put_time(&tm, format.c_str());
+  ss << "." << ms.count();
   return ss.str();
 }
 
 void Sync::init_record_header() {
-  std::ofstream file(saved_data_filename_);
-  if (!file.is_open()) throw std::runtime_error("Could not open record file");
-  file << "time"
-       << ","
-       << "num_flashes"
-       << ","
-       << "period"
-       << ","
-       << "period_adjust"
-       << ","
-       << "phase"
-       << ","
-       << "phase_adjust\n";
+  std::ofstream file(saved_data_filename_, std::fstream::trunc);
+
+  switch (MODEL) {
+    case Model::KURAMOTO: {
+      if (!file.is_open())
+        throw std::runtime_error("Could not open record file");
+      file << "time"
+           << ","
+           << "num_flashes"
+           << ","
+           << "period"
+           << ","
+           << "period_adjust"
+           << ","
+           << "phase"
+           << ","
+           << "phase_adjust\n";
+      file.close();
+    }
+    case Model::INTEGRATE_AND_FIRE: {
+      file << "time"
+           << ","
+           << "num_flashes"
+           << ","
+           << "phase"
+           << ","
+           << "V\n";
+      file.close();
+    }
+  }
+}
+
+void Sync::record_data() {
+  std::ofstream file(saved_data_filename_, std::fstream::app);
+
+  auto tm = std::chrono::high_resolution_clock::now();
+  std::string tm_str = serialize_time_point(tm, time_format_);
+  file << tm_str << ",";
+  file << num_flashes_ << ",";
+  file << blink_.get_phase() << ",";
+  file << Voltage_ << "\n";
+
   file.close();
 }
 

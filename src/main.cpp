@@ -25,11 +25,20 @@ int main(int argc, char* argv[]) {
 
   signal(SIGINT, signalHandler);
 
+  if (cmdOptionExists(argv, argv + argc, "-if")) {
+    std::cout << "Running synchonization Integrate and Fire module"
+              << std::endl;
+    sync.MODEL = Model::INTEGRATE_AND_FIRE;
+  } else {
+    std::cout << "Running synchonization Kuramoto module" << std::endl;
+    sync.MODEL = Model::KURAMOTO;
+  }
+
   if (cmdOptionExists(argv, argv + argc, "-tb")) {
     std::cout << "Testing blinker module" << std::endl;
     Blink blinker;
     if (blinker.initialize()) {
-      blinker.test_blink();
+      blinker.test_phase_blink();
     }
   } else if (cmdOptionExists(argv, argv + argc, "-tc")) {
     std::cout << "Testing camera module" << std::endl;

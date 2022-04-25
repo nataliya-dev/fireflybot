@@ -8,6 +8,7 @@ using time_point = std::chrono::system_clock::time_point;
 namespace fireflybot {
 
 enum class Status { ON = 0, OFF };
+enum class Model { KURAMOTO = 0, INTEGRATE_AND_FIRE };
 
 class Sync {
  public:
@@ -18,12 +19,17 @@ class Sync {
   void start();
 
   static Status STATUS;
+  static Model MODEL;
 
   void set_sim_mode(bool is_sim);
 
  private:
-  const int PHASE_SHIFT_FACTOR = 5;
-  const int PERIOD_CHANGE_FACTOR = 6;
+  // parameters for Kuramotor model
+  const int PHASE_SHIFT_FACTOR = 3;
+  const int PERIOD_CHANGE_FACTOR = 5;
+
+  // parameters for Integrate and Fire model
+  double Voltage_ = 0.5;
 
   long int num_flashes_ = 0;
   long int detect_tm_ms_ = 0;
@@ -39,9 +45,12 @@ class Sync {
   void adjust_period_integrate_fire();
 
   void init_record_header();
+  void record_data();
   void record_data(const std::vector<long int>& data);
   std::string serialize_time_point(const time_point& time,
                                    const std::string& format);
+
+  void integrate_fire(bool is_detected);
 };
 }  // namespace fireflybot
 
