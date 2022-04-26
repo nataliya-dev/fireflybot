@@ -59,6 +59,7 @@ void Blink::test_phase_blink() {
 void Blink::burst_blink() {
   turn_led_on();
   led_trigger_tm_ = std::chrono::high_resolution_clock::now();
+  led_trigger_tm_ += std::chrono::milliseconds(HARDWARE_PROCESSING_MS_);
   std::this_thread::sleep_for(std::chrono::milliseconds(LED_DURATION_MS));
   turn_led_off();
 }
@@ -100,6 +101,7 @@ void Blink::phase_blink() {
   if (!is_led_on_ && phase_ > period_) {
     turn_led_on();
     led_trigger_tm_ = std::chrono::high_resolution_clock::now();
+    led_trigger_tm_ += std::chrono::milliseconds(HARDWARE_PROCESSING_MS_);
     std::cout << "phase_: " << phase_ << std::endl;
     std::cout << "period_: " << period_ << std::endl;
 
