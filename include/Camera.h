@@ -16,7 +16,7 @@ class Camera {
   bool is_flash_detected(long int& detect_tm_ms);
 
   void test_camera();
-
+  void visualize_frames();
   void set_sim_mode(bool is_sim);
 
  private:

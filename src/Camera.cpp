@@ -143,11 +143,6 @@ bool Camera::is_light_on(const cv::Mat& img) {
   cv::erode(getThresh, th_1, element);
   cv::dilate(th_1, th_1, element);
 
-  // show processed and original images
-  //  cv::imshow("processed", th_1);
-  //  cv::imshow("unprocessed", getThresh);
-  //  cv::imshow("og", img);
-
   // sum over entire processed matrix, looks like around 35000 when detected
   double current_sum = cv::sum(th_1)[0];
 
@@ -174,7 +169,55 @@ bool Camera::is_light_on(const cv::Mat& img) {
     return false;
   }
 
-  // cv::waitKey(1);
+}
+
+void Camera::visualize_frames() {
+
+  rs2::frameset frames = pipeline_.wait_for_frames();
+  rs2::video_frame color_frame = frames.get_color_frame();
+  cv::Mat img = convert_to_opencv(color_frame);
+
+  cv::Mat greyMat;
+  cv::Mat getThresh;
+  cv::Mat th_1;
+  cv::Mat th_2;
+
+  // convert to grayscale
+  cv::cvtColor(img, greyMat, cv::COLOR_BGR2GRAY);
+
+  // set threshold
+  cv::threshold(greyMat, getThresh, 80, 255, 0);
+
+  int rect = 0;
+  int k_size = 1;
+
+  // calculate kernel for erosion & dilation
+  cv::Mat element =
+      cv::getStructuringElement(rect, cv::Size(2 * k_size + 1, 2 * k_size + 1),
+                                cv::Point(k_size, k_size));
+
+  // processing
+  cv::erode(getThresh, th_1, element);
+  cv::dilate(th_1, th_1, element);
+
+  
+  // show processed and original images
+  cv::imshow("processed", th_1);
+  cv::imshow("unprocessed", getThresh);
+  cv::imshow("og", img);
+
+  if(img.empty())
+  {
+      std::cout <<"image not loaded" << std::endl;
+  }
+  else
+  {
+    cv::imshow("processed", th_1);
+    cv::imshow("unprocessed", getThresh);
+    cv::imshow("og", img);
+    cv::waitKey(3);
+  }   
+
 }
 
 bool Camera::is_sim_flash() {
