@@ -45,14 +45,6 @@ int main(int argc, char* argv[]) {
     Camera camera;
     if (camera.initialize()) {
       camera.test_camera();
-    } 
-  } else if (cmdOptionExists(argv, argv + argc, "-tv")) {
-    std::cout << "Testing frame visualization" << std::endl;
-    Camera camera;
-    if (camera.initialize()) {
-      while(true) {
-      camera.visualize_frames();
-      }
     }
   } else if (cmdOptionExists(argv, argv + argc, "-sim")) {
     std::cout << "Fireflybot simulation mode" << std::endl;

@@ -143,17 +143,25 @@ bool Camera::is_light_on(const cv::Mat& img) {
   cv::erode(getThresh, th_1, element);
   cv::dilate(th_1, th_1, element);
 
+  if (img.empty() && visualize_frames_) {
+    std::cout << "image not loaded" << std::endl;
+  } else {
+    cv::imshow("processed", th_1);
+    cv::imshow("unprocessed", getThresh);
+    cv::imshow("og", img);
+    cv::waitKey(0);
+  }
+
   // sum over entire processed matrix, looks like around 35000 when detected
   double current_sum = cv::sum(th_1)[0];
 
   // setting the threshold around 4000, based on outputting
   // sum over filtered matrix and observing sums generated from flashes
 
-  // std::cout << s << std::endl;
+  // std::cout << "current_sum: " << current_sum << std::endl;
 
   // if two frames in a row detect a light sum larger than threshold
   // then led is detected, else ignore and return false
-
   if (current_sum > DETECT_THRESH && num_light_frames_ == 0) {
     num_light_frames_++;
     return false;
@@ -168,56 +176,6 @@ bool Camera::is_light_on(const cv::Mat& img) {
     num_light_frames_ = 0;
     return false;
   }
-
-}
-
-void Camera::visualize_frames() {
-
-  rs2::frameset frames = pipeline_.wait_for_frames();
-  rs2::video_frame color_frame = frames.get_color_frame();
-  cv::Mat img = convert_to_opencv(color_frame);
-
-  cv::Mat greyMat;
-  cv::Mat getThresh;
-  cv::Mat th_1;
-  cv::Mat th_2;
-
-  // convert to grayscale
-  cv::cvtColor(img, greyMat, cv::COLOR_BGR2GRAY);
-
-  // set threshold
-  cv::threshold(greyMat, getThresh, 80, 255, 0);
-
-  int rect = 0;
-  int k_size = 1;
-
-  // calculate kernel for erosion & dilation
-  cv::Mat element =
-      cv::getStructuringElement(rect, cv::Size(2 * k_size + 1, 2 * k_size + 1),
-                                cv::Point(k_size, k_size));
-
-  // processing
-  cv::erode(getThresh, th_1, element);
-  cv::dilate(th_1, th_1, element);
-
-  
-  // show processed and original images
-  cv::imshow("processed", th_1);
-  cv::imshow("unprocessed", getThresh);
-  cv::imshow("og", img);
-
-  if(img.empty())
-  {
-      std::cout <<"image not loaded" << std::endl;
-  }
-  else
-  {
-    cv::imshow("processed", th_1);
-    cv::imshow("unprocessed", getThresh);
-    cv::imshow("og", img);
-    cv::waitKey(3);
-  }   
-
 }
 
 bool Camera::is_sim_flash() {
@@ -254,6 +212,8 @@ bool Camera::is_flash_detected(long int& detect_tm_ms) {
   detect_tm_ms =
       std::chrono::duration<double, std::milli>(end_detect_tm - start_detect_tm)
           .count();
+  // multiplied by 2 because we process two frames before confirming it's a
+  // flash
   detect_tm_ms *= 2;
   return is_detected;
 }
