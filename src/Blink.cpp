@@ -96,12 +96,14 @@ long int Blink::get_phase() {
   return phase_;
 }
 
-void Blink::phase_blink() {
+bool Blink::phase_blink() {
   calc_phase();
+  bool do_blink = false;
   if (!is_led_on_ && phase_ > period_) {
     turn_led_on();
     led_trigger_tm_ = std::chrono::high_resolution_clock::now();
     led_trigger_tm_ += std::chrono::milliseconds(HARDWARE_PROCESSING_MS_);
+    do_blink = true;
     std::cout << "phase_: " << phase_ << std::endl;
     std::cout << "period_: " << period_ << std::endl;
 
@@ -110,6 +112,7 @@ void Blink::phase_blink() {
     std::cout << "phase_: " << phase_ << std::endl;
     std::cout << "period_: " << period_ << std::endl;
   }
+  return do_blink;
 }
 
 void Blink::set_sim_mode(bool is_sim) { is_sim_ = is_sim; }

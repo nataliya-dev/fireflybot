@@ -13,7 +13,8 @@ FIG_COUNT = 0
 IMG_FILE_EXTENSION = ".png"
 IMG_TRANSPARENT = False
 OUTPUT_PATH = "figures"
-DATA_FILE_NAME = "sync_data.csv"
+DATA_FILE_NAME_1 = "sync_data_1.csv"
+DATA_FILE_NAME_2 = "sync_data_2.csv"
 IMG_X_SIZE_IN = 10
 IMG_Y_SIZE_IN = 5
 
@@ -88,24 +89,6 @@ def read_to_df(file_name):
     return df
 
 
-def plot_period(df):
-    print("\nPlotting period")
-
-    tm_arr = get_time_array(df)
-    dur_arr = time_to_interval_arr(tm_arr)
-    if not 'period_adjust' in df.index:
-        return
-    period_arr = (df["period"]).to_numpy()
-    fig, ax2d = clear_plt()
-
-    ax2d.scatter(dur_arr, period_arr, linewidth=4, c='#42ff46')
-    ax2d.plot(dur_arr, period_arr, linewidth=2, c='k')
-
-    ax2d.set_xlabel("Time (ms)")
-    ax2d.set_ylabel("Period (ms)")
-    save_fig("period_per_flash")
-
-
 def get_time_array(df):
     time_arr = pd.to_datetime(df["time"])
     return time_arr
@@ -136,22 +119,74 @@ def plot_time_duration(df):
     save_fig("time_interval")
 
 
-def plot_period_shift(df):
+def plot_time_series(df, ax2d, num):
+    print("\nPlotting time series")
+
+    tm_arr = get_time_array(df)
+    dur_arr = time_to_interval_arr(tm_arr)
+
+    if (ax2d.collections) == False:
+        fig, ax2d = clear_plt()
+
+    dur_idx = np.ones(len(dur_arr))
+
+    c_arr = ['b', 'g']
+    for value in dur_arr:
+        x_val = [value, value]
+        y_val = [num-1, num]
+        ax2d.plot(x_val, y_val, c_arr[num-1])
+
+    #ax2d.scatter(dur_arr, dur_idx, c='r')
+    ax2d.set_xlabel("Time (ms)")
+    ax2d.set_ylabel("Flash (I/O)")
+    save_fig("time_series")
+    return ax2d
+
+
+def plot_period(df, ax2d):
+    print("\nPlotting period")
+
+    tm_arr = get_time_array(df)
+    dur_arr = time_to_interval_arr(tm_arr)
+
+    if ('period' in df.columns) == False:
+        print('period not found')
+        return
+    period_arr = (df["period"]).to_numpy()
+
+    if (ax2d.lines) == False:
+        fig, ax2d = clear_plt()
+
+    ax2d.scatter(dur_arr, period_arr, linewidth=4)
+    ax2d.plot(dur_arr, period_arr, linewidth=2)
+
+    ax2d.set_xlabel("Time (ms)")
+    ax2d.set_ylabel("Period (ms)")
+    save_fig("period_per_flash")
+    return ax2d
+
+
+def plot_period_shift(df, ax2d):
     print("\nPlotting phase shift")
 
     tm_arr = get_time_array(df)
     dur_arr = time_to_interval_arr(tm_arr)
-    if not 'period_adjust' in df.index:
+
+    if ('period_adjust' in df.columns) == False:
+        print('period_adjust not found')
         return
     period_arr = (df["period_adjust"]).to_numpy()
-    fig, ax2d = clear_plt()
 
-    ax2d.scatter(dur_arr, period_arr, linewidth=4, c='#ffd343')
-    ax2d.plot(dur_arr, period_arr, linewidth=2, c='k')
+    if (ax2d.lines) == False:
+        fig, ax2d = clear_plt()
+
+    ax2d.scatter(dur_arr, period_arr, linewidth=4)
+    ax2d.plot(dur_arr, period_arr, linewidth=2)
 
     ax2d.set_xlabel("Time (ms)")
     ax2d.set_ylabel("Period shift (ms)")
     save_fig("period_shift")
+    return ax2d
 
 
 def plot_voltage(df):
@@ -159,6 +194,9 @@ def plot_voltage(df):
 
     tm_arr = get_time_array(df)
     dur_arr = time_to_interval_arr(tm_arr)
+    if ('V' in df.columns) == False:
+        print('V not found')
+        return
     v_arr = (df["V"]).to_numpy()
     fig, ax2d = clear_plt()
 
@@ -171,11 +209,24 @@ def plot_voltage(df):
 
 
 create_folder(OUTPUT_PATH)
-df = read_to_df(DATA_FILE_NAME)
+df_1 = read_to_df(DATA_FILE_NAME_1)
+df_2 = read_to_df(DATA_FILE_NAME_2)
+
 update_plt_params()
 
-if df.empty == False:
-    plot_time_duration(df)
-    plot_period(df)
-    plot_period_shift(df)
-    plot_voltage(df)
+if df_1.empty == False:
+    plot_time_duration(df_1)
+
+    fig, ax = clear_plt()
+    ax = plot_period(df_1, ax)
+    plot_period(df_2, ax)
+
+    fig, ax = clear_plt()
+    ax = plot_period_shift(df_1, ax)
+    plot_period_shift(df_2, ax)
+
+    fig, ax = clear_plt()
+    ax = plot_time_series(df_1, ax, 1)
+    plot_time_series(df_2, ax, 2)
+
+    plot_voltage(df_1)

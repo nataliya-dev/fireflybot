@@ -21,8 +21,10 @@ class Blink {
   /**
    * A call which only flashes the LED only if a certain amount of time has
    * passed. Used for the Kuramoto model.
+   *
+   * @return Whether or not the blinker turned on the light.
    */
-  void phase_blink();
+  bool phase_blink();
 
   /**
    * A blocking call which turns the LED on, waits, and then turns it off.

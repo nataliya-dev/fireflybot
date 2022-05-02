@@ -99,9 +99,19 @@ class Sync {
   Blink blink_;
 
   /**
-   * The file name in which syn data will be saved as the process is running.
+   * The folder in which sync data will be saved as the process is running.
    */
-  const std::string saved_data_filename_ = "../scripts/sync_data.csv";
+  const std::string saved_data_folder_ = "../scripts/";
+
+  /**
+   * The file name in which sync data will be saved as the process is running.
+   */
+  std::string sync_data_filename_ = "_sync_data.csv";
+
+  /**
+   * The file name in which blink data will be saved as the process is running.
+   */
+  std::string blink_data_filename_ = "_blink_data.csv";
 
   /**
    * The time format which is used to timestamp all the data being saved.
@@ -134,6 +144,12 @@ class Sync {
    * Record data based on the sync model.
    */
   void record_data();
+
+  /**
+   * Record data based on blink.
+   */
+  void record_data(
+      std::chrono::time_point<std::chrono::high_resolution_clock> tm);
 
   /**
    * Record data based on the sync model.

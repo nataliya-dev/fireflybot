@@ -130,7 +130,11 @@ void Sync::start() {
                   .count();
           std::cout << "adjust_tm_ms: " << adjust_tm_ms << std::endl;
         }
-        blink_.phase_blink();
+        bool is_blink_on = blink_.phase_blink();
+        if (is_blink_on) {
+          record_data(blink_.get_led_trigger_tm());
+        }
+
       } break;
       case Model::INTEGRATE_AND_FIRE: {
         integrate_fire(is_detected);
@@ -161,7 +165,12 @@ std::string Sync::serialize_time_point(const time_point& time,
 }
 
 void Sync::init_record_header() {
-  std::ofstream file(saved_data_filename_, std::fstream::trunc);
+  auto tm = std::chrono::high_resolution_clock::now();
+  std::string tm_str = serialize_time_point(tm, time_format_);
+  sync_data_filename_ = saved_data_folder_ + tm_str + sync_data_filename_;
+  std::cout << "Saving data in: " << sync_data_filename_ << std::endl;
+
+  std::ofstream file(sync_data_filename_, std::fstream::trunc);
 
   switch (MODEL) {
     case Model::KURAMOTO: {
@@ -191,10 +200,15 @@ void Sync::init_record_header() {
       file.close();
     }
   }
+
+  blink_data_filename_ = saved_data_folder_ + tm_str + blink_data_filename_;
+  std::ofstream blink_file(blink_data_filename_, std::fstream::trunc);
+  blink_file << "time"
+             << "\n";
 }
 
 void Sync::record_data() {
-  std::ofstream file(saved_data_filename_, std::fstream::app);
+  std::ofstream file(sync_data_filename_, std::fstream::app);
 
   auto tm = std::chrono::high_resolution_clock::now();
   std::string tm_str = serialize_time_point(tm, time_format_);
@@ -207,7 +221,7 @@ void Sync::record_data() {
 }
 
 void Sync::record_data(const std::vector<long int>& data) {
-  std::ofstream file(saved_data_filename_, std::fstream::app);
+  std::ofstream file(sync_data_filename_, std::fstream::app);
 
   std::size_t num_data_pts = data.size();
   auto tm = std::chrono::high_resolution_clock::now();
@@ -220,6 +234,16 @@ void Sync::record_data(const std::vector<long int>& data) {
       file << data[i] << ",";
     }
   }
+  file.close();
+}
+
+void Sync::record_data(
+    std::chrono::time_point<std::chrono::high_resolution_clock> tm) {
+  std::ofstream file(blink_data_filename_, std::fstream::app);
+
+  std::string tm_str = serialize_time_point(tm, time_format_);
+  file << tm_str << "\n";
+
   file.close();
 }
 
