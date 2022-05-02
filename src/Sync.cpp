@@ -168,7 +168,7 @@ void Sync::init_record_header() {
   auto tm = std::chrono::high_resolution_clock::now();
   std::string tm_str = serialize_time_point(tm, time_format_);
   sync_data_filename_ = saved_data_folder_ + tm_str + sync_data_filename_;
-  std::cout << "Saving data in: " << sync_data_filename_ << std::endl;
+  std::cout << "Saving sync data in: " << sync_data_filename_ << std::endl;
 
   std::ofstream file(sync_data_filename_, std::fstream::trunc);
 
@@ -202,6 +202,8 @@ void Sync::init_record_header() {
   }
 
   blink_data_filename_ = saved_data_folder_ + tm_str + blink_data_filename_;
+  std::cout << "Saving blink data in: " << sync_data_filename_ << std::endl;
+
   std::ofstream blink_file(blink_data_filename_, std::fstream::trunc);
   blink_file << "time"
              << "\n";

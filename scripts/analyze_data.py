@@ -13,8 +13,8 @@ FIG_COUNT = 0
 IMG_FILE_EXTENSION = ".png"
 IMG_TRANSPARENT = False
 OUTPUT_PATH = "figures"
-DATA_FILE_NAME_1 = "sync_data_1.csv"
-DATA_FILE_NAME_2 = "sync_data_2.csv"
+DATA_FILE_NAME_1 = "2022-05-01 18:22:33.719_sync_data.csv"
+DATA_FILE_NAME_2 = "2022-05-01 18:22:33.719_blink_data.csv"
 IMG_X_SIZE_IN = 10
 IMG_Y_SIZE_IN = 5
 

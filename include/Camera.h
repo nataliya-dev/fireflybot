@@ -75,7 +75,7 @@ class Camera {
    * The rate at which the simulated camera will return that a simulated flash
    * has been detected.
    */
-  const int SIM_DETECT_PERIOD_MS = 1000;
+  const int SIM_DETECT_PERIOD_MS = 700;
 
   /**
    * Whether or not to have a pop-up window which displays the images that the
@@ -84,6 +84,12 @@ class Camera {
    * with ssh.
    */
   const bool visualize_frames_ = false;
+
+  /**
+   * Whether or not to save the latest processed frame in the directory. Also
+   * used for debugging.
+   */
+  const bool save_frames_ = false;
 
   /**
    * Keeps track of the time that a simulated flash has been reported.

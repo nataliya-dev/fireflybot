@@ -143,13 +143,17 @@ bool Camera::is_light_on(const cv::Mat& img) {
   cv::erode(getThresh, th_1, element);
   cv::dilate(th_1, th_1, element);
 
-  if (img.empty() && visualize_frames_) {
+  if (img.empty()) {
     std::cout << "image not loaded" << std::endl;
-  } else {
+  } else if (visualize_frames_) {
     cv::imshow("processed", th_1);
     cv::imshow("unprocessed", getThresh);
-    cv::imshow("og", img);
+    cv::imshow("raw", img);
     cv::waitKey(0);
+  } else if (save_frames_) {
+    save_image(th_1, "th_1");
+    save_image(getThresh, "unprocessed");
+    save_image(img, "raw");
   }
 
   // sum over entire processed matrix, looks like around 35000 when detected
