@@ -13,10 +13,10 @@ FIG_COUNT = 0
 IMG_FILE_EXTENSION = ".png"
 IMG_TRANSPARENT = False
 OUTPUT_PATH = "figures"
-DATA_FILE_NAME_1 = "2022-05-01 18:22:33.719_sync_data.csv"
-DATA_FILE_NAME_2 = "2022-05-01 18:22:33.719_blink_data.csv"
+DATA_FILE_NAME_1 = "2022-05-01 19:18:13.335_sync_data.csv"
+DATA_FILE_NAME_2 = "2022-05-01 19:17:59.640_sync_data.csv"
 IMG_X_SIZE_IN = 10
-IMG_Y_SIZE_IN = 5
+IMG_Y_SIZE_IN = 8
 
 
 def create_folder(folder_name):
@@ -112,10 +112,11 @@ def plot_time_duration(df):
     dur_arr = time_to_interval_arr(tm_arr)
 
     fig, ax2d = clear_plt()
-    ax2d.set_xlabel("Index")
-    ax2d.set_ylabel("Time (ms)")
-    dur_idx = np.arange(0, len(dur_arr), 1)
-    ax2d.plot(dur_idx, dur_arr, linewidth=1, c='k')
+    ax2d.set_xlabel("Time")
+    ax2d.set_ylabel("Duration (ms)")
+    plt.xticks(rotation=20)
+    ax2d.scatter(tm_arr, dur_arr)
+    ax2d.plot(tm_arr, dur_arr, linewidth=2)
     save_fig("time_interval")
 
 
@@ -128,15 +129,16 @@ def plot_time_series(df, ax2d, num):
     if (ax2d.collections) == False:
         fig, ax2d = clear_plt()
 
-    dur_idx = np.ones(len(dur_arr))
+    dur_idx = np.ones(len(tm_arr))
 
     c_arr = ['b', 'g']
-    for value in dur_arr:
+    for value in tm_arr:
         x_val = [value, value]
         y_val = [num-1, num]
         ax2d.plot(x_val, y_val, c_arr[num-1])
 
     #ax2d.scatter(dur_arr, dur_idx, c='r')
+    plt.xticks(rotation=20)
     ax2d.set_xlabel("Time (ms)")
     ax2d.set_ylabel("Flash (I/O)")
     save_fig("time_series")
@@ -157,8 +159,9 @@ def plot_period(df, ax2d):
     if (ax2d.lines) == False:
         fig, ax2d = clear_plt()
 
-    ax2d.scatter(dur_arr, period_arr, linewidth=4)
-    ax2d.plot(dur_arr, period_arr, linewidth=2)
+    ax2d.scatter(tm_arr, period_arr, linewidth=4)
+    ax2d.plot(tm_arr, period_arr, linewidth=2)
+    plt.xticks(rotation=20)
 
     ax2d.set_xlabel("Time (ms)")
     ax2d.set_ylabel("Period (ms)")
@@ -180,8 +183,9 @@ def plot_period_shift(df, ax2d):
     if (ax2d.lines) == False:
         fig, ax2d = clear_plt()
 
-    ax2d.scatter(dur_arr, period_arr, linewidth=4)
-    ax2d.plot(dur_arr, period_arr, linewidth=2)
+    ax2d.scatter(tm_arr, period_arr, linewidth=4)
+    ax2d.plot(tm_arr, period_arr, linewidth=2)
+    plt.xticks(rotation=20)
 
     ax2d.set_xlabel("Time (ms)")
     ax2d.set_ylabel("Period shift (ms)")
@@ -200,8 +204,9 @@ def plot_voltage(df):
     v_arr = (df["V"]).to_numpy()
     fig, ax2d = clear_plt()
 
-    ax2d.scatter(dur_arr, v_arr, linewidth=4, c='r')
-    ax2d.plot(dur_arr, v_arr, linewidth=2, c='k')
+    ax2d.scatter(tm_arr, v_arr, linewidth=4, c='r')
+    ax2d.plot(tm_arr, v_arr, linewidth=2, c='k')
+    plt.xticks(rotation=20)
 
     ax2d.set_xlabel("Time (ms)")
     ax2d.set_ylabel("Voltage")

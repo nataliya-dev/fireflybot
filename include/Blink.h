@@ -115,7 +115,7 @@ class Blink {
    * be more or less constant but may need to be adjusted especially if there is
    * a "drift" to the synchonized period between the two synchonized fireflies.
    */
-  const long int HARDWARE_PROCESSING_MS_ = 70;
+  const long int HARDWARE_PROCESSING_MS_ = 35;
 
   /**
    * Open loop test for the phase_blink function.
