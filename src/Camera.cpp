@@ -150,10 +150,6 @@ bool Camera::is_light_on(const cv::Mat& img) {
     cv::imshow("unprocessed", getThresh);
     cv::imshow("raw", img);
     cv::waitKey(0);
-  } else if (save_frames_) {
-    save_image(th_1, "th_1");
-    save_image(getThresh, "unprocessed");
-    save_image(img, "raw");
   }
 
   // sum over entire processed matrix, looks like around 35000 when detected
@@ -166,20 +162,24 @@ bool Camera::is_light_on(const cv::Mat& img) {
 
   // if two frames in a row detect a light sum larger than threshold
   // then led is detected, else ignore and return false
+  bool retval = false;
   if (current_sum > DETECT_THRESH && num_light_frames_ == 0) {
     num_light_frames_++;
-    return false;
   } else if (current_sum > DETECT_THRESH && num_light_frames_ == 1) {
     std::cout << "\nFlash detected!" << std::endl;
     num_light_frames_++;
-    return true;
+    retval = true;  
   } else if (current_sum > DETECT_THRESH && num_light_frames_ > 1) {
     num_light_frames_++;
-    return false;
   } else {
     num_light_frames_ = 0;
-    return false;
   }
+  if (retval && save_frames_) {
+    save_image(th_1, "th_1");
+    save_image(getThresh,"unprocessed");
+    save_image(img,"raw");
+  }
+  return retval;
 }
 
 bool Camera::is_sim_flash() {
