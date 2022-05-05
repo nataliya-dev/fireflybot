@@ -12,6 +12,7 @@ bool Camera::initialize() {
   rs2::config config;
   set_config(config);
   pipeline_.start(config);
+  std::cout << "Leaving camera config" << std::endl;
 
   return true;
 }
@@ -163,22 +164,17 @@ bool Camera::is_light_on(const cv::Mat& img) {
   // if two frames in a row detect a light sum larger than threshold
   // then led is detected, else ignore and return false
   bool retval = false;
-  if (current_sum > DETECT_THRESH && num_light_frames_ == 0) {
-    num_light_frames_++;
-  } else if (current_sum > DETECT_THRESH && num_light_frames_ == 1) {
+  current_frame_ = current_sum > DETECT_THRESH;
+  if (!previous_frame_ && current_frame_) {
     std::cout << "\nFlash detected!" << std::endl;
-    num_light_frames_++;
-    retval = true;  
-  } else if (current_sum > DETECT_THRESH && num_light_frames_ > 1) {
-    num_light_frames_++;
-  } else {
-    num_light_frames_ = 0;
+    retval = true;
   }
   if (retval && save_frames_) {
     save_image(th_1, "th_1");
     save_image(getThresh,"unprocessed");
     save_image(img,"raw");
   }
+  previous_frame_ = current_frame_;
   return retval;
 }
 
@@ -216,9 +212,6 @@ bool Camera::is_flash_detected(long int& detect_tm_ms) {
   detect_tm_ms =
       std::chrono::duration<double, std::milli>(end_detect_tm - start_detect_tm)
           .count();
-  // multiplied by 2 because we process two frames before confirming it's a
-  // flash
-  detect_tm_ms *= 2;
   return is_detected;
 }
 

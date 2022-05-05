@@ -61,6 +61,16 @@ class Camera {
   int num_light_frames_ = 0;
 
   /**
+   * Detection value of the previous frame
+   */ 
+  bool previous_frame_ = false;
+  
+  /**
+   * Detection value of the current frame
+   */
+  bool current_frame_ = false;
+
+  /**
    * Keeps track of the sum of light pixels detected on the previous camera
    * frame.
    */
@@ -89,7 +99,7 @@ class Camera {
    * Whether or not to save the latest processed frame in the directory. Also
    * used for debugging.
    */
-  const bool save_frames_ = false;
+  const bool save_frames_ = true;
 
   /**
    * Keeps track of the time that a simulated flash has been reported.

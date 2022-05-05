@@ -71,7 +71,7 @@ class Sync {
    * TUNING PARAMETER: How much to adjust the blink period after a flash has
    * been detected.
    */
-  const int PERIOD_CHANGE_FACTOR = 5;
+  const int PERIOD_CHANGE_FACTOR = 3;
 
   /**
    * Keep track of the voltage for the integrate and fire model.
