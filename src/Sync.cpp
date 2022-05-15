@@ -62,7 +62,9 @@ void Sync::adjust_period_kuramoto() {
   num_flashes_++;
 
   auto detected_tm = std::chrono::high_resolution_clock::now();
+  std::string tm_str = serialize_time_point(detected_tm, time_format_);
   detected_tm -= std::chrono::milliseconds(detect_tm_ms_);
+  std::cout << "Timestamp: " << tm_str << std::endl;
   std::cout << "detect_tm_ms_: " << detect_tm_ms_ << std::endl;
   auto led_trigger_tm = blink_.get_led_trigger_tm();
   long int elapsed_time_ms =
@@ -253,5 +255,5 @@ void Sync::set_sim_mode(bool is_sim) {
   blink_.set_sim_mode(true);
   camera_.set_sim_mode(true);
 }
+} //namespace fireflybot
 
-}  // namespace fireflybot
