@@ -65,6 +65,7 @@ void Blink::burst_blink() {
 }
 
 long int Blink::get_init_sync_period() { return INITIAL_SYNC_PERIOD_MS; }
+void Blink::set_init_sync_period(long int period) {  INITIAL_SYNC_PERIOD_MS = period; }
 
 std::chrono::time_point<std::chrono::high_resolution_clock>
 Blink::get_led_trigger_tm() {

@@ -36,8 +36,8 @@ cv::Mat Camera::convert_to_opencv(const rs2::video_frame& color_frame) {
   return cv_img;
 }
 
-void Camera::save_image(const cv::Mat& cv_img, std::string name) {
-  name = name + ".jpg";
+void Camera::save_image(const cv::Mat& cv_img, std::string name, int frame) {
+  name = name + "_" + std::to_string(frame) + ".jpg" ;
   bool check = cv::imwrite(name, cv_img);
   if (check == false) {
     std::cout << "FAILED to save image" << std::endl;
@@ -164,15 +164,16 @@ bool Camera::is_light_on(const cv::Mat& img) {
   // if two frames in a row detect a light sum larger than threshold
   // then led is detected, else ignore and return false
   bool retval = false;
+  frame += 1;
   current_frame_ = current_sum > DETECT_THRESH;
   if (!previous_frame_ && current_frame_) {
     std::cout << "\nFlash detected!" << std::endl;
     retval = true;
   }
   if (retval && save_frames_) {
-    save_image(th_1, "th_1");
-    save_image(getThresh,"unprocessed");
-    save_image(img,"raw");
+    save_image(th_1, "th_1", frame);
+    save_image(getThresh,"unprocessed", frame);
+    save_image(img,"raw", frame);
   }
   previous_frame_ = current_frame_;
   return retval;

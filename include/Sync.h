@@ -39,6 +39,13 @@ class Sync {
    * to synchonize with a light in its environment.
    */
   void start();
+  /**
+   * Set the initial period. Initialized to default of 900ms (see main.cpp)
+   * if not passed.
+   * 
+   * @param[in] period Period time.
+   */
+  void set_initial_period(long int period);
 
   /**
    * The status of the sync module.
@@ -97,6 +104,11 @@ class Sync {
    * The interface to the hardware and software that flashes a light.
    */
   Blink blink_;
+
+  /**
+   * Whether to write sync data to file
+   **/
+  const bool _write_data = False;
 
   /**
    * The folder in which sync data will be saved as the process is running.

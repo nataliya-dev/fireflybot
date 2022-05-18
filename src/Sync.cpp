@@ -103,13 +103,15 @@ void Sync::adjust_period_kuramoto() {
   std::cout << "new period: " << period << std::endl;
   blink_.set_period(period);
 
-  std::vector<long int> data;
-  data.emplace_back(num_flashes_);
-  data.emplace_back(period);
-  data.emplace_back(period_adjust_ms);
-  data.emplace_back(blink_.get_phase());
-  data.emplace_back(phase_adjust_ms);
-  record_data(data);
+  if (_write_data){
+    std::vector<long int> data;
+    data.emplace_back(num_flashes_);
+    data.emplace_back(period);
+    data.emplace_back(period_adjust_ms);
+    data.emplace_back(blink_.get_phase());
+    data.emplace_back(phase_adjust_ms);
+    record_data(data);
+  }
 
   return;
 }
@@ -133,8 +135,10 @@ void Sync::start() {
           std::cout << "adjust_tm_ms: " << adjust_tm_ms << std::endl;
         }
         bool is_blink_on = blink_.phase_blink();
-        if (is_blink_on) {
-          record_data(blink_.get_led_trigger_tm());
+        if (_write_data) {
+          if (is_blink_on) {
+            record_data(blink_.get_led_trigger_tm());
+          }
         }
 
       } break;
@@ -254,6 +258,11 @@ void Sync::record_data(
 void Sync::set_sim_mode(bool is_sim) {
   blink_.set_sim_mode(true);
   camera_.set_sim_mode(true);
+}
+
+void Sync::set_initial_period(long int period) {
+  blink_.set_init_sync_period(period);
+  blink_.set_period(period);
 }
 } //namespace fireflybot
 

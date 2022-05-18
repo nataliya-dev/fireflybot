@@ -61,6 +61,11 @@ class Camera {
   int num_light_frames_ = 0;
 
   /**
+   *  current frame
+   **/
+  int frame = 0;
+
+  /**
    * Detection value of the previous frame
    */ 
   bool previous_frame_ = false;
