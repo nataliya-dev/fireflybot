@@ -54,14 +54,14 @@ bool Camera::is_light_on(const cv::Mat& img) {
   cv::cvtColor(img, greyMat, cv::COLOR_BGR2GRAY);
 
   // set threshold
-  cv::threshold(greyMat, getThresh, 80, 255, 0);
+  cv::threshold(greyMat, getThresh, 60, 255, 0);  //(greyMat, getThresh, 80, 255, 0)
 
   int rect = 0;
   int k_size = 1;
 
   // calculate kernel for erosion & dilation
   cv::Mat element =
-      cv::getStructuringElement(rect, cv::Size(2 * k_size + 1, 2 * k_size + 1),
+      cv::getStructuringElement(rect, cv::Size(2 * k_size, 2 * k_size), //k_size+1
                                 cv::Point(k_size, k_size));
 
   // processing
@@ -80,11 +80,8 @@ bool Camera::is_light_on(const cv::Mat& img) {
   // sum over entire processed matrix, looks like around 35000 when detected
   double current_sum = cv::sum(th_1)[0];
 
-  // setting the threshold around 4000, based on outputting
+  // setting the threshold around 2500, based on outputting
   // sum over filtered matrix and observing sums generated from flashes
-
-  // std::cout << "current_sum: " << current_sum << std::endl;
-
   // if two frames in a row detect a light sum larger than threshold
   // then led is detected, else ignore and return false
   bool retval = false;

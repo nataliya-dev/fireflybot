@@ -53,7 +53,7 @@ class Camera {
    * run into an issue where the firefly is not detected because it is dim, then
    * this value might need to be reduced.
    */
-  const double DETECT_THRESH = 4000;
+  const double DETECT_THRESH = 2500;
 
   /**
    * Number of consecutive flashes detected in consecutive frames.
