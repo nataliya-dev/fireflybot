@@ -42,6 +42,10 @@ int main(int argc, char* argv[]) {
               << std::endl;
   sync.set_initial_period(initial_period);
 
+  if (cmdOptionExists(argv, argv + argc, "-write")) {
+    sync.set_write_data();
+  }
+
   if (cmdOptionExists(argv, argv + argc, "-if")) {
     std::cout << "Running synchonization Integrate and Fire module"
               << std::endl;

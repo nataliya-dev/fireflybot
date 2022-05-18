@@ -118,7 +118,7 @@ void Sync::adjust_period_kuramoto() {
 
 void Sync::start() {
   std::cout << "Starting Sync" << std::endl;
-  init_record_header();
+  if (_write_data){ init_record_header(); }
 
   while (STATUS == Status::ON) {
     bool is_detected = camera_.is_flash_detected(detect_tm_ms_);
@@ -264,5 +264,7 @@ void Sync::set_initial_period(long int period) {
   blink_.set_init_sync_period(period);
   blink_.set_period(period);
 }
+
+void Sync::set_write_data() { _write_data = true; }
 } //namespace fireflybot
 

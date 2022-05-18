@@ -67,6 +67,11 @@ class Sync {
    */
   void set_sim_mode(bool is_sim);
 
+  /**
+   * Flip write data bit
+   */
+  void set_write_data();
+
  private:
   /**
    * TUNING PARAMETER: How much to adjust the blink phase after a flash has been
