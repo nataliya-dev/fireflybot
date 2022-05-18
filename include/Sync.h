@@ -108,7 +108,7 @@ class Sync {
   /**
    * Whether to write sync data to file
    **/
-  const bool _write_data = False;
+  const bool _write_data = false;
 
   /**
    * The folder in which sync data will be saved as the process is running.
