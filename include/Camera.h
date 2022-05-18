@@ -62,8 +62,8 @@ class Camera {
 
   /**
    *  current frame
-   **/
-  int frame = 0;
+   */
+  int _frame = 0;
 
   /**
    * Detection value of the previous frame
@@ -140,16 +140,7 @@ class Camera {
    * @param[in] cv_img The image that will be saved.
    * @param[in] name The name of the saved image file.
    */
-  void save_image(const cv::Mat& cv_img, std::string name);
-
-  /**
-   * Attempt to detect a light in the frame as a blob.
-   * Currently, not being used. See is_light_on for the function in use.
-   *
-   * @param[in] img The frame used to detect a blob.
-   * @return Whether or not a blob has been detected.
-   */
-  bool detect_blob(const cv::Mat& img);
+  void save_image(const cv::Mat& cv_img, std::string name, int frame);
 
   /**
    * Attempt to detect a light in the frame based on a threshold. If there are
