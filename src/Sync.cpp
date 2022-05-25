@@ -136,10 +136,10 @@ void Sync::start() {
         }
         bool is_blink_on = blink_.phase_blink();
         if (_write_data) {
-          if (is_blink_on) {
-            record_data(blink_.get_led_trigger_tm());
-          }
-        }
+         if (is_blink_on) {
+           record_data(blink_.get_led_trigger_tm());
+         }
+       }
 
       } break;
       case Model::INTEGRATE_AND_FIRE: {

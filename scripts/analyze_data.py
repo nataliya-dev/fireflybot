@@ -7,14 +7,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pylab import cm
 import matplotlib as mpl
+import sys
 
 
 FIG_COUNT = 0
 IMG_FILE_EXTENSION = ".png"
 IMG_TRANSPARENT = False
 OUTPUT_PATH = "figures"
-DATA_FILE_NAME_1 = "2022-05-01 19:18:13.335_sync_data.csv"
-DATA_FILE_NAME_2 = "2022-05-01 19:17:59.640_sync_data.csv"
 IMG_X_SIZE_IN = 10
 IMG_Y_SIZE_IN = 8
 
@@ -214,8 +213,8 @@ def plot_voltage(df):
 
 
 create_folder(OUTPUT_PATH)
-df_1 = read_to_df(DATA_FILE_NAME_1)
-df_2 = read_to_df(DATA_FILE_NAME_2)
+df_1 = read_to_df(sys.argv[1]) #DATA_FILE_NAME_1)
+#df_2 = read_to_df(DATA_FILE_NAME_2)
 
 update_plt_params()
 
@@ -224,14 +223,14 @@ if df_1.empty == False:
 
     fig, ax = clear_plt()
     ax = plot_period(df_1, ax)
-    plot_period(df_2, ax)
+ #   plot_period(df_2, ax)
 
     fig, ax = clear_plt()
     ax = plot_period_shift(df_1, ax)
-    plot_period_shift(df_2, ax)
+ #   plot_period_shift(df_2, ax)
 
     fig, ax = clear_plt()
     ax = plot_time_series(df_1, ax, 1)
-    plot_time_series(df_2, ax, 2)
+ #   plot_time_series(df_2, ax, 2)
 
-    plot_voltage(df_1)
+  #  plot_voltage(df_1)

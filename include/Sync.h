@@ -72,6 +72,12 @@ class Sync {
    */
   void set_write_data();
 
+
+  /**
+   * Whether to write sync data to file
+   **/
+  bool _write_data = false;
+
  private:
   /**
    * TUNING PARAMETER: How much to adjust the blink phase after a flash has been
@@ -109,11 +115,6 @@ class Sync {
    * The interface to the hardware and software that flashes a light.
    */
   Blink blink_;
-
-  /**
-   * Whether to write sync data to file
-   **/
-  const bool _write_data = false;
 
   /**
    * The folder in which sync data will be saved as the process is running.
