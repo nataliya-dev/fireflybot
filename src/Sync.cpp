@@ -36,27 +36,29 @@ void Sync::integrate_fire(bool is_detected) {
 
   // MODEL params-----
   double I = 1.0;
-  double eta = 1.0;
-  double beta = 0.65;
-  double N = 10.0;
-  double N_mult = 500.0;
+  double beta = 0.99; // flash immediately after seeing
+  double denom = 200; // 7s
 
   if (is_detected) {
     num_flashes_++;
-    Voltage_ = std::min(1.0, Voltage_ + (beta / N));
+    Voltage_ = std::min(1.0, Voltage_ + beta);
   } else {
-    double dV = I - eta * Voltage_;
-    // std::cout << "dV: " << dV << std::endl;
-    Voltage_ = Voltage_ + (dV / (N_mult * N));
+    double dV = I / denom;
+    Voltage_ = std::min(1.0, Voltage_ + dV);
   }
-  // std::cout << "Voltage: " << Voltage_ << std::endl;
-  // std::cout << "Phase: " << blink_.get_phase() << std::endl;
-
-  record_data();
+  if (_write_data){
+    std::vector<long int> data;
+    data.emplace_back(num_flashes_);
+    data.emplace_back(blink_.get_period());
+    data.emplace_back(blink_.get_nf());
+    data.emplace_back(blink_.get_phase());
+    data.emplace_back(Voltage_);
+    record_data(data);
+  }
 }
 
 void Sync::adjust_period_kuramoto() {
-  std::cout << "Adjusting phase based on kuramoto model" << std::endl;
+  std::cout << "Adjusting inter-flash phase" << std::endl;
   // https://github.com/owingit/fireflysync/blob/master/kuramato_better_sensor/kuramato_better_sensor.ino
 
   num_flashes_++;
@@ -81,6 +83,10 @@ void Sync::adjust_period_kuramoto() {
   } else {
     adjust_ms = elapsed_time_ms - period;
   }
+
+  if (adjust_ms > period) {
+    adjust_ms = adjust_ms % period;
+  }
   std::cout << "adjust_ms: " << adjust_ms << std::endl;
 
   long int phase_adjust_ms = adjust_ms / PHASE_SHIFT_FACTOR;
@@ -96,22 +102,18 @@ void Sync::adjust_period_kuramoto() {
   long int period_adjust_ms = adjust_ms / PERIOD_CHANGE_FACTOR;
   std::cout << "period_adjust_ms: " << period_adjust_ms << std::endl;
   period += period_adjust_ms;
-  // period = clip(
-  //     period, blink_.get_init_sync_period() - blink_.get_init_sync_period() /
-  //     2, blink_.get_init_sync_period() + blink_.get_init_sync_period() / 2);
-
   std::cout << "new period: " << period << std::endl;
   blink_.set_period(period);
 
-  if (_write_data){
-    std::vector<long int> data;
-    data.emplace_back(num_flashes_);
-    data.emplace_back(period);
-    data.emplace_back(period_adjust_ms);
-    data.emplace_back(blink_.get_phase());
-    data.emplace_back(phase_adjust_ms);
-    record_data(data);
-  }
+  // if (_write_data){
+  //   std::vector<long int> data;
+  //   data.emplace_back(num_flashes_);
+  //   data.emplace_back(period);
+  //   data.emplace_back(period_adjust_ms);
+  //   data.emplace_back(blink_.get_phase());
+  //   data.emplace_back(phase_adjust_ms);
+  //   record_data(data);
+  // }
 
   return;
 }
@@ -122,7 +124,7 @@ void Sync::start() {
 
   while (STATUS == Status::ON) {
     bool is_detected = camera_.is_flash_detected(detect_tm_ms_);
-
+    
     switch (MODEL) {
       case Model::KURAMOTO: {
         if (is_detected == true) {
@@ -143,10 +145,27 @@ void Sync::start() {
 
       } break;
       case Model::INTEGRATE_AND_FIRE: {
-        integrate_fire(is_detected);
-        if (Voltage_ >= 0.999) {
-          blink_.burst_blink();
-          Voltage_ = 0.0;
+        if (blink_.get_state()) {
+          if (is_detected) { adjust_period_kuramoto();}
+          bool is_blink_on = blink_.phase_blink();
+          if (is_blink_on) { Voltage_ -= (1.0 / blink_.get_nf());}
+          if (Voltage_ <= 0.0) { 
+            Voltage_ = 0.0;
+            blink_.set_state(false);
+            blink_.turn_led_off();
+            blink_.set_nf(rand()%(10-4 + 1) + 4);
+          }
+        //   if (_write_data) {
+        //     if (is_blink_on) {
+        //       record_data(blink_.get_led_trigger_tm());
+        //     }
+        //  }
+        }
+        else {
+          integrate_fire(is_detected);
+          if (Voltage_ >= 0.99) {
+            blink_.set_state(true);
+          }
         }
       } break;
     }

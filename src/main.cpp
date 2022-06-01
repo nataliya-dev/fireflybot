@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
     sync.set_write_data();
   }
 
-  if (cmdOptionExists(argv, argv + argc, "-if")) {
+  if (cmdOptionExists(argv, argv + argc, "-inf")) {
     std::cout << "Running synchonization Integrate and Fire module"
               << std::endl;
     sync.MODEL = Model::INTEGRATE_AND_FIRE;

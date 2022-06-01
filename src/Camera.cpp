@@ -59,7 +59,7 @@ bool Camera::is_light_on(const cv::Mat& img) {
   int rect = 0;
   int k_size = 1;
 
-  // calculate kernel for erosion & dilation
+  // calculate kernel for erosion &dilation
   cv::Mat element =
       cv::getStructuringElement(rect, cv::Size(2 * k_size, 2 * k_size), //k_size+1
                                 cv::Point(k_size, k_size));

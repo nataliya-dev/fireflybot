@@ -80,6 +80,12 @@ void Blink::set_led_trigger_tm(
 long int Blink::get_period() { return period_; }
 void Blink::set_period(long int period) { period_ = period; }
 
+bool Blink::get_state() { return flashing_; }
+void Blink::set_state(bool state) { flashing_ = state; }
+
+long int Blink::get_nf() { return n_f_; }
+void Blink::set_nf(long int num_flash) { n_f_ = num_flash; }
+
 void Blink::calc_phase() {
   auto now_tm = std::chrono::high_resolution_clock::now();
   long int elapsed_time_ms =

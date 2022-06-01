@@ -76,7 +76,23 @@ class Blink {
    */
   void set_period(long int period);
 
-
+  /**
+   * Setter for the flashing state
+   **/
+  void set_state(bool state);
+  /**
+   * Getter for the flashing state
+   **/
+  bool get_state();
+  
+  /**
+   * Setter for the flash count
+   **/
+  void set_nf(long int num_flash);
+  /**
+   * Getter for the flash count
+   **/
+  long int get_nf();
   /**
    * Setter for the starting period at which the fireflybot should flash its LED.
    *
@@ -94,6 +110,16 @@ class Blink {
    */
   void test_phase_blink();
 
+   /**
+   * Turn the LED off.
+   */
+  void turn_led_on();
+
+  /**
+   * Turn the LED off.
+   */
+  void turn_led_off();
+
   /**
    * Set the simulated blinker on or off. This is used for testing and debug of
    * synchronization model.
@@ -108,7 +134,7 @@ class Blink {
    * TUNING PARAMETER: The amount of time the LED will be turned on to signal a
    * flash.
    */
-  const long int LED_DURATION_MS = 10;
+  const long int LED_DURATION_MS = 30;
 
   /**
    * TUNING PARAMETER: The approximate amount of time it takes between sending
@@ -141,6 +167,11 @@ class Blink {
   long int phase_ = 0;
 
   /**
+   * Current number of flashes.
+   */
+  long int n_f_ = 5;
+
+  /**
    * TUNING PARAMETER: Set the initial blink period at which the LED will blink.
    * This value should not be more than double of the flashing period of the
    * firefly with which this fireflybot it trying to sync with.
@@ -158,14 +189,9 @@ class Blink {
   bool is_led_on_ = false;
 
   /**
-   * Turn the LED off.
+   * Whether in a flash train
    */
-  void turn_led_on();
-
-  /**
-   * Turn the LED off.
-   */
-  void turn_led_off();
+  bool flashing_ = false;
 
   /**
    * Calculate the current phase.
