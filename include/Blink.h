@@ -93,6 +93,15 @@ class Blink {
    * Getter for the flash count
    **/
   long int get_nf();
+
+  /**
+   * Setter for the interburst interval
+   **/
+  void set_interburst(long int interburst);
+  /**
+   * Getter for the interburst interval
+   **/
+  long int get_interburst();
   /**
    * Setter for the starting period at which the fireflybot should flash its LED.
    *
@@ -134,7 +143,7 @@ class Blink {
    * TUNING PARAMETER: The amount of time the LED will be turned on to signal a
    * flash.
    */
-  const long int LED_DURATION_MS = 30;
+  const long int LED_DURATION_MS = 70;
 
   /**
    * TUNING PARAMETER: The approximate amount of time it takes between sending
@@ -170,6 +179,11 @@ class Blink {
    * Current number of flashes.
    */
   long int n_f_ = 5;
+
+  /**
+   * Current inter-burst interval.
+   */
+  long int t_b_ = 200;
 
   /**
    * TUNING PARAMETER: Set the initial blink period at which the LED will blink.

@@ -48,6 +48,19 @@ class Sync {
   void set_initial_period(long int period);
 
   /**
+   * Set the beta parameter (for integrate and fire).
+   * 
+   * @param[in] beta .
+   */
+  void set_beta(double beta);
+
+  /**
+   * Get the beta parameter (for integrate and fire).
+   */
+  double get_beta();
+
+
+  /**
    * The status of the sync module.
    */
   static Status STATUS;
@@ -95,6 +108,11 @@ class Sync {
    * Keep track of the voltage for the integrate and fire model.
    */
   double Voltage_ = 0.5;
+
+  /**
+   * Beta parameter for integrate and fire model.
+   */
+  double beta_ = 0.99;
 
   /**
    * The number of flashes that have been detected.

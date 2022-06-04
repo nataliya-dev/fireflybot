@@ -12,6 +12,8 @@ using namespace fireflybot;
  *   Default starting period
  **/
 const long int DEFAULT_STARTING_PERIOD = 900; //ms
+const double DEFAULT_STARTING_BETA = 0.99; //ms
+
 Sync sync;
 
 void signalHandler(int signum) {
@@ -29,23 +31,43 @@ int main(int argc, char* argv[]) {
 
   signal(SIGINT, signalHandler);
 
+  // set starting period from command line
   long int initial_period = DEFAULT_STARTING_PERIOD;
   if (cmdOptionExists(argv, argv + argc, "-isp")) {
     for (int i = 0; i < argc; i++) {
-      if (atol(argv[i]) > 0) {
-        initial_period = atol(argv[i]);
-        break;
+      if (argv[i][0] != '.' || argv[i][0] != '0') {
+        if (atol(argv[i]) > 0) {
+          initial_period = atol(argv[i]);
+          break;
+        }
       }
     }
   }
+  sync.set_initial_period(initial_period);
   std::cout << "Initial sync period: " << initial_period << "ms"
               << std::endl;
-  sync.set_initial_period(initial_period);
 
+  // set beta from command line
+  double beta = DEFAULT_STARTING_BETA;
+  if (cmdOptionExists(argv, argv + argc, "-beta")) {
+    for (int i = 0; i < argc; i++) {
+      if (argv[i][0] == '.' || argv[i][0] == '0') {
+        if (atof(argv[i]) > 0) {
+          beta = atof(argv[i]);
+          break;
+        }
+      }
+    }
+  }
+  sync.set_beta(beta);
+  std::cout << "Beta: " << sync.get_beta() << std::endl;
+
+  // set up writing from command line
   if (cmdOptionExists(argv, argv + argc, "-write")) {
     sync.set_write_data();
   }
 
+  // choose sync model 
   if (cmdOptionExists(argv, argv + argc, "-inf")) {
     std::cout << "Running synchonization Integrate and Fire module"
               << std::endl;
@@ -55,6 +77,7 @@ int main(int argc, char* argv[]) {
     sync.MODEL = Model::KURAMOTO;
   }
 
+  // establish whether testing or running
   if (cmdOptionExists(argv, argv + argc, "-tb")) {
     std::cout << "Testing blinker module" << std::endl;
     Blink blinker;

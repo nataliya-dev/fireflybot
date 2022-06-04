@@ -36,12 +36,11 @@ void Sync::integrate_fire(bool is_detected) {
 
   // MODEL params-----
   double I = 1.0;
-  double beta = 0.99; // flash immediately after seeing
-  double denom = 200; // 7s
+  double denom = blink_.get_interburst(); // 7s
 
   if (is_detected) {
     num_flashes_++;
-    Voltage_ = std::min(1.0, Voltage_ + beta);
+    Voltage_ = std::min(1.0, Voltage_ + beta_);
   } else {
     double dV = I / denom;
     Voltage_ = std::min(1.0, Voltage_ + dV);
@@ -154,6 +153,7 @@ void Sync::start() {
             blink_.set_state(false);
             blink_.turn_led_off();
             blink_.set_nf(rand()%(10-4 + 1) + 4);
+            blink_.set_interburst(rand()%(500-150 + 1) + 150);
           }
         //   if (_write_data) {
         //     if (is_blink_on) {
@@ -282,6 +282,14 @@ void Sync::set_sim_mode(bool is_sim) {
 void Sync::set_initial_period(long int period) {
   blink_.set_init_sync_period(period);
   blink_.set_period(period);
+}
+
+void Sync::set_beta(double beta) {
+  beta_ = beta;
+}
+
+double Sync::get_beta() {
+  return beta_;
 }
 
 void Sync::set_write_data() { _write_data = true; }

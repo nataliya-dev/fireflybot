@@ -86,6 +86,9 @@ void Blink::set_state(bool state) { flashing_ = state; }
 long int Blink::get_nf() { return n_f_; }
 void Blink::set_nf(long int num_flash) { n_f_ = num_flash; }
 
+long int Blink::get_interburst() { return t_b_; }
+void Blink::set_interburst(long int interburst) { t_b_ = interburst; }
+
 void Blink::calc_phase() {
   auto now_tm = std::chrono::high_resolution_clock::now();
   long int elapsed_time_ms =
