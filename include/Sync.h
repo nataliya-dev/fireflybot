@@ -96,18 +96,23 @@ class Sync {
    * TUNING PARAMETER: How much to adjust the blink phase after a flash has been
    * detected.
    */
-  const int PHASE_SHIFT_FACTOR = 3;
+  const int PHASE_SHIFT_FACTOR = 30;
 
   /**
    * TUNING PARAMETER: How much to adjust the blink period after a flash has
    * been detected.
    */
-  const int PERIOD_CHANGE_FACTOR = 3;
+  const int PERIOD_CHANGE_FACTOR = 30;
 
   /**
    * Keep track of the voltage for the integrate and fire model.
    */
   double Voltage_ = 0.5;
+
+  /**
+   * Keep track of when finished for refractory.
+   */
+  std::chrono::high_resolution_clock::time_point finished_time = std::chrono::high_resolution_clock::now();
 
   /**
    * Beta parameter for integrate and fire model.
@@ -143,6 +148,11 @@ class Sync {
    * The file name in which sync data will be saved as the process is running.
    */
   std::string sync_data_filename_ = "_sync_data.csv";
+
+  /**
+   * The file name in which sync data will be saved as the process is running.
+   */
+  std::string if_sync_data_filename_ = "_if_data.csv";
 
   /**
    * The file name in which blink data will be saved as the process is running.
@@ -194,6 +204,14 @@ class Sync {
    * correspond to the header.
    */
   void record_data(const std::vector<long int>& data);
+
+  /**
+   * Record data based on the IF sync model.
+   *
+   * @param[in] data The vector of data that needs to be recorded. Must
+   * correspond to the header.
+   */
+  void record_data_if(const std::vector<long int>& data);
 
   /**
    * Take a time point and convert it into a string. The string is then saved in

@@ -39,8 +39,17 @@ void Sync::integrate_fire(bool is_detected) {
   double denom = blink_.get_interburst(); // 7s
 
   if (is_detected) {
+    auto tm_now = std::chrono::high_resolution_clock::now();
+    long int elapsed_since_beginning = std::chrono::duration<double, std::milli>(tm_now - finished_time).count();
+    long int qp = blink_.get_nf()*(blink_.get_period() + 30);
+    if (elapsed_since_beginning > qp) { 
+      Voltage_ = std::min(1.0, Voltage_ + beta_);
+    }
+    else { 
+      double dV = I / denom;
+      Voltage_ = std::min(1.0, Voltage_ + dV);
+    }
     num_flashes_++;
-    Voltage_ = std::min(1.0, Voltage_ + beta_);
   } else {
     double dV = I / denom;
     Voltage_ = std::min(1.0, Voltage_ + dV);
@@ -52,7 +61,7 @@ void Sync::integrate_fire(bool is_detected) {
     data.emplace_back(blink_.get_nf());
     data.emplace_back(blink_.get_phase());
     data.emplace_back(Voltage_);
-    record_data(data);
+    record_data_if(data);
   }
 }
 
@@ -84,7 +93,7 @@ void Sync::adjust_period_kuramoto() {
   }
 
   if (adjust_ms > period) {
-    adjust_ms = adjust_ms % period;
+    adjust_ms = 0;
   }
   std::cout << "adjust_ms: " << adjust_ms << std::endl;
 
@@ -104,15 +113,15 @@ void Sync::adjust_period_kuramoto() {
   std::cout << "new period: " << period << std::endl;
   blink_.set_period(period);
 
-  // if (_write_data){
-  //   std::vector<long int> data;
-  //   data.emplace_back(num_flashes_);
-  //   data.emplace_back(period);
-  //   data.emplace_back(period_adjust_ms);
-  //   data.emplace_back(blink_.get_phase());
-  //   data.emplace_back(phase_adjust_ms);
-  //   record_data(data);
-  // }
+  if (_write_data){
+    std::vector<long int> data;
+    data.emplace_back(num_flashes_);
+    data.emplace_back(period);
+    data.emplace_back(period_adjust_ms);
+    data.emplace_back(blink_.get_phase());
+    data.emplace_back(phase_adjust_ms);
+    record_data(data);
+  }
 
   return;
 }
@@ -145,21 +154,24 @@ void Sync::start() {
       } break;
       case Model::INTEGRATE_AND_FIRE: {
         if (blink_.get_state()) {
-          if (is_detected) { adjust_period_kuramoto();}
+          if (is_detected) { 
+            adjust_period_kuramoto();
+          }
           bool is_blink_on = blink_.phase_blink();
           if (is_blink_on) { Voltage_ -= (1.0 / blink_.get_nf());}
           if (Voltage_ <= 0.0) { 
             Voltage_ = 0.0;
             blink_.set_state(false);
             blink_.turn_led_off();
-            blink_.set_nf(rand()%(10-4 + 1) + 4);
-            blink_.set_interburst(rand()%(500-150 + 1) + 150);
+            blink_.set_nf(rand()%(6-2 + 1) + 2);
+            blink_.set_interburst(rand()%(800-400 + 1) + 400);
+            finished_time = std::chrono::high_resolution_clock::now();
           }
-        //   if (_write_data) {
-        //     if (is_blink_on) {
-        //       record_data(blink_.get_led_trigger_tm());
-        //     }
-        //  }
+          if (_write_data) {
+            if (is_blink_on) {
+              record_data(blink_.get_led_trigger_tm());
+            }
+         }
         }
         else {
           integrate_fire(is_detected);
@@ -215,19 +227,43 @@ void Sync::init_record_header() {
       file.close();
     }
     case Model::INTEGRATE_AND_FIRE: {
+      if (!file.is_open())
+        throw std::runtime_error("Could not open record file");
       file << "time"
            << ","
            << "num_flashes"
            << ","
+           << "period"
+           << ","
+           << "period_adjust"
+           << ","
            << "phase"
            << ","
-           << "V\n";
+           << "phase_adjust\n";
       file.close();
+      if_sync_data_filename_ = saved_data_folder_ + tm_str + if_sync_data_filename_;
+      std::cout << "Saving sync data in: " << if_sync_data_filename_ << std::endl;
+
+      std::ofstream iffile(if_sync_data_filename_, std::fstream::trunc);
+      if (!iffile.is_open())
+        throw std::runtime_error("Could not open record iffile");
+      iffile << "time"
+           << ","
+           << "num_flashes"
+           << ","
+           << "period"
+           << ","
+           << "n_f"
+           << ","
+           << "phase" 
+           << "," 
+           << "V\n";
+      iffile.close();
     }
   }
 
   blink_data_filename_ = saved_data_folder_ + tm_str + blink_data_filename_;
-  std::cout << "Saving blink data in: " << sync_data_filename_ << std::endl;
+  std::cout << "Saving blink data in: " << blink_data_filename_ << std::endl;
 
   std::ofstream blink_file(blink_data_filename_, std::fstream::trunc);
   blink_file << "time"
@@ -264,6 +300,24 @@ void Sync::record_data(const std::vector<long int>& data) {
   file.close();
 }
 
+
+void Sync::record_data_if(const std::vector<long int>& data) {
+  std::ofstream file(if_sync_data_filename_, std::fstream::app);
+
+  std::size_t num_data_pts = data.size();
+  auto tm = std::chrono::high_resolution_clock::now();
+  std::string tm_str = serialize_time_point(tm, time_format_);
+  file << tm_str << ",";
+  for (std::size_t i = 0; i < num_data_pts; i++) {
+    if (i == num_data_pts - 1) {
+      file << data[i] << "\n";
+    } else {
+      file << data[i] << ",";
+    }
+  }
+  file.close();
+}
+
 void Sync::record_data(
     std::chrono::time_point<std::chrono::high_resolution_clock> tm) {
   std::ofstream file(blink_data_filename_, std::fstream::app);
@@ -282,7 +336,7 @@ void Sync::set_sim_mode(bool is_sim) {
 void Sync::set_initial_period(long int period) {
   blink_.set_init_sync_period(period);
   blink_.set_period(period);
-}
+} 
 
 void Sync::set_beta(double beta) {
   beta_ = beta;

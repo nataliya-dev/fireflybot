@@ -67,6 +67,9 @@ void Blink::burst_blink() {
 long int Blink::get_init_sync_period() { return INITIAL_SYNC_PERIOD_MS; }
 void Blink::set_init_sync_period(long int period) {  INITIAL_SYNC_PERIOD_MS = period; }
 
+long int Blink::get_interburst() { return t_b_; }
+void Blink::set_interburst(long int interburst) {  t_b_ = interburst; }
+
 std::chrono::time_point<std::chrono::high_resolution_clock>
 Blink::get_led_trigger_tm() {
   return led_trigger_tm_;
@@ -83,11 +86,8 @@ void Blink::set_period(long int period) { period_ = period; }
 bool Blink::get_state() { return flashing_; }
 void Blink::set_state(bool state) { flashing_ = state; }
 
-long int Blink::get_nf() { return n_f_; }
+long Blink::get_nf() { return n_f_; }
 void Blink::set_nf(long int num_flash) { n_f_ = num_flash; }
-
-long int Blink::get_interburst() { return t_b_; }
-void Blink::set_interburst(long int interburst) { t_b_ = interburst; }
 
 void Blink::calc_phase() {
   auto now_tm = std::chrono::high_resolution_clock::now();

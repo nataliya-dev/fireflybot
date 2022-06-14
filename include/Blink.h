@@ -143,7 +143,7 @@ class Blink {
    * TUNING PARAMETER: The amount of time the LED will be turned on to signal a
    * flash.
    */
-  const long int LED_DURATION_MS = 70;
+  const long int LED_DURATION_MS = 30;
 
   /**
    * TUNING PARAMETER: The approximate amount of time it takes between sending
