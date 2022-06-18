@@ -12,6 +12,7 @@ bool Camera::initialize() {
   rs2::config config;
   set_config(config);
   pipeline_.start(config);
+  std::cout << "Leaving camera config" << std::endl;
 
   return true;
 }
@@ -35,88 +36,12 @@ cv::Mat Camera::convert_to_opencv(const rs2::video_frame& color_frame) {
   return cv_img;
 }
 
-void Camera::save_image(const cv::Mat& cv_img, std::string name) {
-  name = name + ".jpg";
+void Camera::save_image(const cv::Mat& cv_img, std::string name, int frame) {
+  name = name + "_" + std::to_string(frame) + ".jpg";
   bool check = cv::imwrite(name, cv_img);
   if (check == false) {
     std::cout << "FAILED to save image" << std::endl;
   }
-}
-
-bool Camera::detect_blob(const cv::Mat& img) {
-  // cv::Mat bwImg;
-  // cv::cvtColor(img, bwImg, cv::CV_BGR2GRAY);
-  // save_image(bwImg, "bwImg");
-
-  // Create a structuring element (SE)
-  int morph_size = 1;
-  cv::Mat element = cv::getStructuringElement(
-      cv::MORPH_RECT, cv::Size(2 * morph_size + 1, 2 * morph_size + 1),
-      cv::Point(morph_size, morph_size));
-  // For Erosion
-  cv::Mat morphedImg;
-  cv::erode(img, morphedImg, element, cv::Point(-1, -1), 1);
-  save_image(morphedImg, "morphedImg");
-
-  // cv::Mat blurredImg;
-  // cv::blur(morphedImg, blurredImg, cv::Size(8, 8), cv::Point(-1, -1));
-  // save_image(blurredImg, "blurredImg");
-
-  // cv::Mat bwImg2;
-  // cv::cvtColor(morphedImg, bwImg2, CV_BGR2GRAY);
-  // save_image(bwImg2, "bwImg2");
-
-  // cv::Mat threshImg;
-  // cv::adaptiveThreshold(bwImg2, threshImg, 200, cv::ADAPTIVE_THRESH_MEAN_C,
-  //                       cv::THRESH_BINARY, 3, 2);
-  // save_image(threshImg, "threshImg");
-
-  // https://learnopencv.com/blob-detection-using-opencv-python-c/
-  // Setup SimpleBlobDetector parameters.
-  cv::SimpleBlobDetector::Params params;
-
-  // Change thresholds
-  params.minThreshold = 0;
-  params.maxThreshold = 0;
-
-  // Filter by Area.
-  params.filterByArea = false;
-  params.minArea = 500;
-
-  // Filter by Circularity
-  params.filterByCircularity = false;
-  params.minCircularity = 0.3;
-
-  // Filter by Convexity
-  params.filterByConvexity = false;
-  params.minConvexity = 0.87;
-
-  // Set up detector with params
-  cv::Ptr<cv::SimpleBlobDetector> detector =
-      cv::SimpleBlobDetector::create(params);
-
-  // detect blobs
-  std::vector<cv::KeyPoint> keypoints;
-  detector->detect(morphedImg, keypoints);
-
-  // Draw detected blobs as red circles.
-  // DrawMatchesFlags::DRAW_RICH_KEYPOINTS flag ensures the size of the circle
-  // corresponds to the size of blob
-  cv::Mat im_with_keypoints;
-  cv::drawKeypoints(morphedImg, keypoints, im_with_keypoints,
-                    cv::Scalar(0, 0, 255),
-                    cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-
-  // cv::imshow("img", img);
-  // cv::waitKey(0);
-  // save_image(img, "raw");
-  // save_image(im_with_keypoints, "keypoints");
-
-  if (keypoints.size() == 0) {
-    return false;
-  }
-
-  return true;
 }
 
 bool Camera::is_light_on(const cv::Mat& img) {
@@ -129,15 +54,16 @@ bool Camera::is_light_on(const cv::Mat& img) {
   cv::cvtColor(img, greyMat, cv::COLOR_BGR2GRAY);
 
   // set threshold
-  cv::threshold(greyMat, getThresh, 80, 255, 0);
+  cv::threshold(greyMat, getThresh, 60, 255,
+                0);  //(greyMat, getThresh, 80, 255, 0)
 
   int rect = 0;
   int k_size = 1;
 
   // calculate kernel for erosion & dilation
-  cv::Mat element =
-      cv::getStructuringElement(rect, cv::Size(2 * k_size + 1, 2 * k_size + 1),
-                                cv::Point(k_size, k_size));
+  cv::Mat element = cv::getStructuringElement(
+      rect, cv::Size(2 * k_size, 2 * k_size),  // k_size+1
+      cv::Point(k_size, k_size));
 
   // processing
   cv::erode(getThresh, th_1, element);
@@ -155,30 +81,23 @@ bool Camera::is_light_on(const cv::Mat& img) {
   // sum over entire processed matrix, looks like around 35000 when detected
   double current_sum = cv::sum(th_1)[0];
 
-  // setting the threshold around 4000, based on outputting
+  // setting the threshold around 2500, based on outputting
   // sum over filtered matrix and observing sums generated from flashes
-
-  // std::cout << "current_sum: " << current_sum << std::endl;
-
   // if two frames in a row detect a light sum larger than threshold
   // then led is detected, else ignore and return false
   bool retval = false;
-  if (current_sum > DETECT_THRESH && num_light_frames_ == 0) {
-    num_light_frames_++;
-  } else if (current_sum > DETECT_THRESH && num_light_frames_ == 1) {
+  _frame += 1;
+  current_frame_ = current_sum > DETECT_THRESH;
+  if (!previous_frame_ && current_frame_) {
     std::cout << "\nFlash detected!" << std::endl;
-    num_light_frames_++;
-    retval = true;  
-  } else if (current_sum > DETECT_THRESH && num_light_frames_ > 1) {
-    num_light_frames_++;
-  } else {
-    num_light_frames_ = 0;
+    retval = true;
   }
   if (retval && save_frames_) {
-    save_image(th_1, "th_1");
-    save_image(getThresh,"unprocessed");
-    save_image(img,"raw");
+    save_image(th_1, "th_1", _frame);
+    save_image(getThresh, "unprocessed", _frame);
+    save_image(img, "raw", _frame);
   }
+  previous_frame_ = current_frame_;
   return retval;
 }
 
@@ -216,9 +135,6 @@ bool Camera::is_flash_detected(long int& detect_tm_ms) {
   detect_tm_ms =
       std::chrono::duration<double, std::milli>(end_detect_tm - start_detect_tm)
           .count();
-  // multiplied by 2 because we process two frames before confirming it's a
-  // flash
-  detect_tm_ms *= 2;
   return is_detected;
 }
 

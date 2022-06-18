@@ -77,6 +77,14 @@ class Blink {
   void set_period(long int period);
 
   /**
+   * Setter for the starting period at which the fireflybot should flash its
+   * LED.
+   *
+   * @param[in] Duration ms.
+   */
+  void set_init_sync_period(long int period);
+
+  /**
    * Open loop test for the burst_blink function.
    */
   void test_burst_blink();
@@ -97,17 +105,10 @@ class Blink {
 
  private:
   /**
-   * TUNING PARAMETER: Set the initial blink period at which the LED will blink.
-   * This value should not be more than double of the flashing period of the
-   * firefly with which this fireflybot it trying to sync with.
-   */
-  const long int INITIAL_SYNC_PERIOD_MS = 900;
-
-  /**
    * TUNING PARAMETER: The amount of time the LED will be turned on to signal a
    * flash.
    */
-  const long int LED_DURATION_MS = 100;
+  const long int LED_DURATION_MS = 10;
 
   /**
    * TUNING PARAMETER: The approximate amount of time it takes between sending
@@ -140,9 +141,16 @@ class Blink {
   long int phase_ = 0;
 
   /**
+   * TUNING PARAMETER: Set the initial blink period at which the LED will blink.
+   * This value should not be more than double of the flashing period of the
+   * firefly with which this fireflybot it trying to sync with.
+   */
+  long int INITIAL_SYNC_PERIOD_MS;
+
+  /**
    * Current blink period.
    */
-  long int period_ = INITIAL_SYNC_PERIOD_MS;
+  long int period_;
 
   /**
    * Whether or not the LED is currently turned on.

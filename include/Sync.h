@@ -39,6 +39,13 @@ class Sync {
    * to synchonize with a light in its environment.
    */
   void start();
+  /**
+   * Set the initial period. Initialized to default of 900ms (see main.cpp)
+   * if not passed.
+   *
+   * @param[in] period Period time.
+   */
+  void set_initial_period(long int period);
 
   /**
    * The status of the sync module.
@@ -60,6 +67,16 @@ class Sync {
    */
   void set_sim_mode(bool is_sim);
 
+  /**
+   * Flip write data bit
+   */
+  void set_write_data();
+
+  /**
+   * Whether to write sync data to file
+   **/
+  bool _write_data = false;
+
  private:
   /**
    * TUNING PARAMETER: How much to adjust the blink phase after a flash has been
@@ -71,7 +88,7 @@ class Sync {
    * TUNING PARAMETER: How much to adjust the blink period after a flash has
    * been detected.
    */
-  const int PERIOD_CHANGE_FACTOR = 5;
+  const int PERIOD_CHANGE_FACTOR = 3;
 
   /**
    * Keep track of the voltage for the integrate and fire model.

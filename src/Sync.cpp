@@ -62,7 +62,9 @@ void Sync::adjust_period_kuramoto() {
   num_flashes_++;
 
   auto detected_tm = std::chrono::high_resolution_clock::now();
+  std::string tm_str = serialize_time_point(detected_tm, time_format_);
   detected_tm -= std::chrono::milliseconds(detect_tm_ms_);
+  std::cout << "Timestamp: " << tm_str << std::endl;
   std::cout << "detect_tm_ms_: " << detect_tm_ms_ << std::endl;
   auto led_trigger_tm = blink_.get_led_trigger_tm();
   long int elapsed_time_ms =
@@ -101,20 +103,24 @@ void Sync::adjust_period_kuramoto() {
   std::cout << "new period: " << period << std::endl;
   blink_.set_period(period);
 
-  std::vector<long int> data;
-  data.emplace_back(num_flashes_);
-  data.emplace_back(period);
-  data.emplace_back(period_adjust_ms);
-  data.emplace_back(blink_.get_phase());
-  data.emplace_back(phase_adjust_ms);
-  record_data(data);
+  if (_write_data) {
+    std::vector<long int> data;
+    data.emplace_back(num_flashes_);
+    data.emplace_back(period);
+    data.emplace_back(period_adjust_ms);
+    data.emplace_back(blink_.get_phase());
+    data.emplace_back(phase_adjust_ms);
+    record_data(data);
+  }
 
   return;
 }
 
 void Sync::start() {
   std::cout << "Starting Sync" << std::endl;
-  init_record_header();
+  if (_write_data) {
+    init_record_header();
+  }
 
   while (STATUS == Status::ON) {
     bool is_detected = camera_.is_flash_detected(detect_tm_ms_);
@@ -131,8 +137,10 @@ void Sync::start() {
           std::cout << "adjust_tm_ms: " << adjust_tm_ms << std::endl;
         }
         bool is_blink_on = blink_.phase_blink();
-        if (is_blink_on) {
-          record_data(blink_.get_led_trigger_tm());
+        if (_write_data) {
+          if (is_blink_on) {
+            record_data(blink_.get_led_trigger_tm());
+          }
         }
 
       } break;
@@ -254,4 +262,10 @@ void Sync::set_sim_mode(bool is_sim) {
   camera_.set_sim_mode(true);
 }
 
+void Sync::set_initial_period(long int period) {
+  blink_.set_init_sync_period(period);
+  blink_.set_period(period);
+}
+
+void Sync::set_write_data() { _write_data = true; }
 }  // namespace fireflybot

@@ -53,12 +53,27 @@ class Camera {
    * run into an issue where the firefly is not detected because it is dim, then
    * this value might need to be reduced.
    */
-  const double DETECT_THRESH = 4000;
+  const double DETECT_THRESH = 1200;
 
   /**
    * Number of consecutive flashes detected in consecutive frames.
    */
   int num_light_frames_ = 0;
+
+  /**
+   *  current frame
+   */
+  int _frame = 0;
+
+  /**
+   * Detection value of the previous frame
+   */
+  bool previous_frame_ = false;
+
+  /**
+   * Detection value of the current frame
+   */
+  bool current_frame_ = false;
 
   /**
    * Keeps track of the sum of light pixels detected on the previous camera
@@ -89,7 +104,7 @@ class Camera {
    * Whether or not to save the latest processed frame in the directory. Also
    * used for debugging.
    */
-  const bool save_frames_ = false;
+  const bool save_frames_ = true;
 
   /**
    * Keeps track of the time that a simulated flash has been reported.
@@ -125,16 +140,7 @@ class Camera {
    * @param[in] cv_img The image that will be saved.
    * @param[in] name The name of the saved image file.
    */
-  void save_image(const cv::Mat& cv_img, std::string name);
-
-  /**
-   * Attempt to detect a light in the frame as a blob.
-   * Currently, not being used. See is_light_on for the function in use.
-   *
-   * @param[in] img The frame used to detect a blob.
-   * @return Whether or not a blob has been detected.
-   */
-  bool detect_blob(const cv::Mat& img);
+  void save_image(const cv::Mat& cv_img, std::string name, int frame);
 
   /**
    * Attempt to detect a light in the frame based on a threshold. If there are

@@ -8,6 +8,10 @@
 
 using namespace fireflybot;
 
+/**
+ *   Default starting period
+ **/
+const long int DEFAULT_STARTING_PERIOD = 900;  // ms
 Sync sync;
 
 void signalHandler(int signum) {
@@ -25,6 +29,22 @@ int main(int argc, char* argv[]) {
 
   signal(SIGINT, signalHandler);
 
+  long int initial_period = DEFAULT_STARTING_PERIOD;
+  if (cmdOptionExists(argv, argv + argc, "-isp")) {
+    for (int i = 0; i < argc; i++) {
+      if (atol(argv[i]) > 0) {
+        initial_period = atol(argv[i]);
+        break;
+      }
+    }
+  }
+  std::cout << "Initial sync period: " << initial_period << "ms" << std::endl;
+  sync.set_initial_period(initial_period);
+
+  if (cmdOptionExists(argv, argv + argc, "-write")) {
+    sync.set_write_data();
+  }
+
   if (cmdOptionExists(argv, argv + argc, "-if")) {
     std::cout << "Running synchonization Integrate and Fire module"
               << std::endl;
@@ -37,6 +57,8 @@ int main(int argc, char* argv[]) {
   if (cmdOptionExists(argv, argv + argc, "-tb")) {
     std::cout << "Testing blinker module" << std::endl;
     Blink blinker;
+    blinker.set_init_sync_period(initial_period);
+    blinker.set_period(initial_period);
     if (blinker.initialize()) {
       blinker.test_phase_blink();
     }
