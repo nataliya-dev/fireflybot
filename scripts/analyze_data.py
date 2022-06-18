@@ -13,8 +13,8 @@ FIG_COUNT = 0
 IMG_FILE_EXTENSION = ".png"
 IMG_TRANSPARENT = False
 OUTPUT_PATH = "figures"
-DATA_FILE_NAME_1 = "2022-05-01 19:18:13.335_sync_data.csv"
-DATA_FILE_NAME_2 = "2022-05-01 19:17:59.640_sync_data.csv"
+DATA_FILE_NAME_1 = "2022-05-04 16:28:06.980_blink_data.csv"
+DATA_FILE_NAME_2 = "2022-05-04 16:28:06.980_sync_data.csv"
 IMG_X_SIZE_IN = 10
 IMG_Y_SIZE_IN = 8
 
@@ -156,7 +156,7 @@ def plot_period(df, ax2d):
         return
     period_arr = (df["period"]).to_numpy()
 
-    if (ax2d.lines) == False:
+    if not ax2d:
         fig, ax2d = clear_plt()
 
     ax2d.scatter(tm_arr, period_arr, linewidth=4)
@@ -180,7 +180,7 @@ def plot_period_shift(df, ax2d):
         return
     period_arr = (df["period_adjust"]).to_numpy()
 
-    if (ax2d.lines) == False:
+    if not ax2d:
         fig, ax2d = clear_plt()
 
     ax2d.scatter(tm_arr, period_arr, linewidth=4)
@@ -221,6 +221,7 @@ update_plt_params()
 
 if df_1.empty == False:
     plot_time_duration(df_1)
+    plot_time_duration(df_2)
 
     fig, ax = clear_plt()
     ax = plot_period(df_1, ax)
