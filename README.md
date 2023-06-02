@@ -20,6 +20,7 @@ Fireflybot mimics the synchonization patterns of fireflies with electronic compo
 - [Intel® RealSense™ D400 cameras with Raspberry Pi](https://github.com/IntelRealSense/librealsense/blob/master/doc/RaspberryPi3.md)
 - Build with DBUILD_GRAPHICAL_EXAMPLES=false
 - Specify the cores when running make (`` make -j `nproc`  ``)
+- In some cases the RAM capacity is not sufficient to compile the SDK, so if the compilation process crashes or exits with an error-code try to create a swap file and then recompile the SDK.
 
 ## Usage
 
